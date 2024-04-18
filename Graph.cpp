@@ -9,7 +9,6 @@ public:
     int numEdges;
     std::vector<std::vector<int>> adjacencyMatrix;
 
-public:
     void loadGraph(vector<vector<int>> g)
     {
             // Check if the graph is a square matrix.
@@ -37,6 +36,10 @@ public:
     // {
     //     adjacencyMatrix.resize(numVertices, std::vector<int>(numVertices, 0));
     // }
+    
+    std::vector<std::vector<int>> getAdjacencyMatrix(Graph g)  {
+        return  this->adjacencyMatrix;
+    }
 
     void printGraph()
     {

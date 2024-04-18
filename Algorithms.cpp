@@ -1,9 +1,13 @@
-#include "Algorithms.hpp"
 
 namespace ariel
 {
-    namespace Algorithms
+    class Algorithms
     {
+
+#include "Algorithms.hpp"
+#include "Graph.hpp"
+#include <limits.h>
+    public:
         bool isContainsCycle(ariel::Graph g)
         {
             return false;
@@ -11,11 +15,12 @@ namespace ariel
 
         int isConnected(ariel::Graph g)
         {
-            for(int i=0; i<g->djacencyMatrix.size(); i++)
+            std::vector<std::vector<int>> G = getAdjacencyMatrix(g);
+            for (int i = 0; i < g->djacencyMatrix.size(); i++)
             {
-                for(int j=0; j<g->djacencyMatrix[0].size(); j++)
+                for (int j = 0; j < g->djacencyMatrix[0].size(); j++)
                 {
-                    if(g->djacencyMatrix[i][j]==0 && g->djacencyMatrix[j][i] == 0)
+                    if (g->djacencyMatrix[i][j] == 0 && g->djacencyMatrix[j][i] == 0)
                     {
                         return 0;
                     }
@@ -26,7 +31,7 @@ namespace ariel
 
         string shortestPath(ariel::Graph g, int start, int end)
         {
-            return "0->1->2";
+            return BellmanFord(const Graph &graph, int src);
         }
 
         string isBipartite(ariel::Graph g)
@@ -39,98 +44,96 @@ namespace ariel
             return "no negative cycle";
         }
 
+        // Function to implement Bellman-Ford algorithm
+        vector<int> BellmanFord(const Graph &graph, int src)
+        {
+            int V = graph.numVertices;
+
+            // Create a distance vector and initialize all distances as infinite (except source)
+            vector<int> dist(V, numeric_limits<int>::max());
+            dist[src] = 0; // Distance from source to itself is 0
+
+            // Relax all edges V-1 times. If negative cycle is found, return false.
+            for (int i = 0; i < V - 1; ++i)
+            {
+                for (int u = 0; u < V; ++u)
+                {
+                    for (int v = 0; v < V; ++v)
+                    {
+                        // Check if the edge (u, v) exists and if relaxing it improves the distance
+                        if (graph.adjacencyMatrix[u][v] != 0 && dist[u] + graph.adjacencyMatrix[u][v] < dist[v])
+                        {
+                            dist[v] = dist[u] + graph.adjacencyMatrix[u][v];
+                        }
+                    }
+                }
+            }
+
+            // Check for negative-weight cycles. If there is a cycle, a shorter path
+            // will be found even after V-1 relaxations.
+            for (int u = 0; u < V; ++u)
+            {
+                for (int v = 0; v < V; ++v)
+                {
+                    if (graph.adjacencyMatrix[u][v] != 0 && dist[u] + graph.adjacencyMatrix[u][v] < dist[v])
+                    {
+                        throw runtime_error("Graph contains a negative-weight cycle!");
+                    }
+                }
+            }
+
+            return dist;
+        }
 
 
 
+        // Function to check if a graph is bipartite
+pair<vector<int>, vector<int>> isBipartite(const Graph& graph) {
+    int V = graph.numVertices;
 
-        // A C++ program for Bellman-Ford's single source
-// shortest path algorithm.
-#include <bits/stdc++.h>
-using namespace std;
+    // Create a color vector to store colors assigned to vertices.
+    // 0 - Uncolored, 1 - Red, -1 - Blue
+    vector<int> color(V, 0);
 
-// a structure to represent a weighted edge in graph
-struct Edge {
-    int src, dest, weight;
-};
+    // BFS to check if any odd-length cycle exists (not bipartite)
+    for (int u = 0; u < V; ++u) {
+        if (color[u] == 0) {
+            queue<int> q;
+            color[u] = 1; // Assign starting color (Red)
+            q.push(u);
 
-// a structure to represent a connected, directed and
-// weighted graph
-struct Graph {
-    // V-> Number of vertices, E-> Number of edges
-    int V, E;
+            while (!q.empty()) {
+                int v = q.front();
+                q.pop();
 
-    // graph is represented as an array of edges.
-    struct Edge* edge;
-};
-
-// Creates a graph with V vertices and E edges
-struct Graph* createGraph(int V, int E)
-{
-    struct Graph* graph = new Graph;
-    graph->V = V;
-    graph->E = E;
-    graph->edge = new Edge[E];
-    return graph;
-}
-
-// A utility function used to print the solution
-void printArr(int dist[], int n)
-{
-    printf("Vertex   Distance from Source\n");
-    for (int i = 0; i < n; ++i)
-        printf("%d \t\t %d\n", i, dist[i]);
-}
-
-// The main function that finds shortest distances from src
-// to all other vertices using Bellman-Ford algorithm.  The
-// function also detects negative weight cycle
-void BellmanFord( ariel::Graph g, int start, int end)
-{
-    int V = graph->V;
-    int E = graph->E;
-    int dist[V];
-
-    // Step 1: Initialize distances from src to all other
-    // vertices as INFINITE
-    for (int i = 0; i < V; i++)
-        dist[i] = INT_MAX;
-    dist[src] = 0;
-
-    // Step 2: Relax all edges |V| - 1 times. A simple
-    // shortest path from src to any other vertex can have
-    // at-most |V| - 1 edges
-    for (int i = 1; i <= V - 1; i++) {
-        for (int j = 0; j < E; j++) {
-            int u = graph->edge[j].src;
-            int v = graph->edge[j].dest;
-            int weight = graph->edge[j].weight;
-            if (dist[u] != INT_MAX
-                && dist[u] + weight < dist[v])
-                dist[v] = dist[u] + weight;
+                // Check for adjacent vertices
+                for (int w = 0; w < V; ++w) {
+                    if (graph.adjacencyMatrix[v][w] != 0) {
+                        if (color[w] == 0) {
+                            color[w] = -color[v]; // Assign opposite color (Blue)
+                            q.push(w);
+                        } else if (color[w] == color[v]) {
+                            // Adjacent vertices with same color (odd-length cycle)
+                            return make_pair(vector<int>(), vector<int>()); // Not bipartite
+                        }
+                    }
+                }
+            }
         }
     }
 
-    // Step 3: check for negative-weight cycles.  The above
-    // step guarantees shortest distances if graph doesn't
-    // contain negative weight cycle.  If we get a shorter
-    // path, then there is a cycle.
-    for (int i = 0; i < E; i++) {
-        int u = graph->edge[i].src;
-        int v = graph->edge[i].dest;
-        int weight = graph->edge[i].weight;
-        if (dist[u] != INT_MAX
-            && dist[u] + weight < dist[v]) {
-            printf("Graph contains negative weight cycle");
-            return; // If negative cycle is detected, simply
-                    // return
+    // Separate vertices based on colors (assuming colors 1 and -1)
+    vector<int> group1, group2;
+    for (int i = 0; i < V; ++i) {
+        if (color[i] == 1) {
+            group1.push_back(i);
+        } else {
+            group2.push_back(i);
         }
     }
 
-    printArr(dist, V);
-
-    return;
+    return make_pair(group1, group2);
 }
-
-
     }
 }
+

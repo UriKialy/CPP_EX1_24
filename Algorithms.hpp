@@ -2,6 +2,7 @@
 #include <iostream>
 #include "Graph.hpp"
 #include "Graph.cpp"
+#include <bits/stdc++.h>
 using namespace ariel;
 using namespace std;
 namespace ariel{
@@ -23,5 +24,5 @@ namespace ariel{
         // this function will return the negative cycle in the graph if there is one. if there is no negative cycle it will return "no negative cycle"
         static string negativeCycle(ariel::Graph g);
 
-}
+};
 }

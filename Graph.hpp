@@ -18,5 +18,8 @@ namespace ariel
 
         //this function will print the graph
         void printGraph();
+
+        //this function will return the adjacency matrix of the graph
+        std::vector<std::vector<int>> getAdjacencyMatrix(Graph g);
     };
 }
