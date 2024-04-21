@@ -1,13 +1,18 @@
 #include "Graph.hpp"
 #include <vector>
 using namespace std;
-
+namespace ariel{
 class Graph
 {
 public:
     int numVertices;
     int numEdges;
     std::vector<std::vector<int>> adjacencyMatrix;
+    Graph(){
+        numVertices = 0;
+        numEdges = 0;
+        this->adjacencyMatrix = {};
+    }
 
     void loadGraph(vector<vector<int>> g)
     {
@@ -47,3 +52,4 @@ public:
         cout << "Graph with " << numVertices << " vertices and " << numEdges << " edges." << endl;
     }
 };
+}

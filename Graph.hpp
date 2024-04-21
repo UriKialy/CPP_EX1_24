@@ -1,18 +1,19 @@
+#ifndef GRAPH_HPP
+#define GRAPH_HPP
 #include "doctest.h"
 #include <iostream>
 #include <vector>
-
 using namespace std;
 namespace ariel
 {
     class Graph
     {
         vector<vector<int>> graph;
+        int numVertices;
+         int numEdges;
     public:
-        Graph()
-        {
-            this->graph = {};
-        }
+        Graph();
+
         //this function will load the graph to the object
         void loadGraph(vector<vector<int>> g);
 
@@ -23,3 +24,4 @@ namespace ariel
         std::vector<std::vector<int>> getAdjacencyMatrix(Graph g);
     };
 }
+#endif
