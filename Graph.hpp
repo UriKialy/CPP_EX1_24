@@ -21,7 +21,13 @@ namespace ariel
         void printGraph();
 
         //this function will return the adjacency matrix of the graph
-        std::vector<std::vector<int>> getAdjacencyMatrix(Graph g);
+        std::vector<std::vector<int>> getAdjacencyMatrix();
+
+        //this function will return the number of vertices in the graph
+        int getNumVertices();
+
+        //this function will return the number of edges in the graph
+        int getNumEdges();
     };
 }
 #endif
