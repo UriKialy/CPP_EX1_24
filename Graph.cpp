@@ -3,62 +3,54 @@
 using namespace std;
 namespace ariel
 {
-    class Graph
+    unsigned long numVertices;
+    unsigned long numEdges;
+    std::vector<std::vector<int>> adjacencyMatrix;
+    Graph::Graph()
     {
-    public:
-        int numVertices;
-        int numEdges;
-        std::vector<std::vector<int>> adjacencyMatrix;
-        Graph()
+        numVertices = 0;
+        numEdges = 0;
+        adjacencyMatrix = {};
+    }
+    void Graph::loadGraph(vector<vector<int>> g)
+    {
+        // Check if the graph is a square matrix.
+        if (g.size() == g[0].size())
         {
-            numVertices = 0;
-            numEdges = 0;
-            this->adjacencyMatrix = {};
+            this->numVertices = g.size();
         }
-        void loadGraph(vector<vector<int>> g)
+        else
         {
-            // Check if the graph is a square matrix.
-            if (g.size() == g[0].size())
+            throw invalid_argument("The graph is not a square matrix");
+        }
+        adjacencyMatrix = g;// Load the mstrix to the graph 
+        int numofedges = 0;
+        for (unsigned long i = 0; i < numVertices; i++)
+        {
+            for (unsigned long j = 0; j < numVertices; j++)
             {
-                this->numVertices = g.size();
-            }
-            else
-            {
-                throw invalid_argument("The graph is not a square matrix");
-            }
-            this->adjacencyMatrix = g;
-            int numedges = 0;
-            for (int i = 0; i < numVertices; i++)
-            {
-                for (int j = 0; j < numVertices; j++)
+                if (adjacencyMatrix[i][j] != 0)
                 {
-                    if (adjacencyMatrix[i][j] != 0)
-                    {
-                        numedges++;
-                    }
+                    numofedges++;
                 }
             }
-            this->numEdges = numedges;
         }
-        Graph() : numVertices(0)
-        {
-            adjacencyMatrix = {};
-        }
-        std::vector<std::vector<int>> getAdjacencyMatrix()
-        {
-            return this->adjacencyMatrix;
-        }
-        void printGraph()
-        {
-            cout << "Graph with " << numVertices << " vertices and " << numEdges << " edges." << endl;
-        }
-        int getNumVertices()
-        {
-            return this->numVertices;
-        }
-        int getNumEdges()
-        {
-            return this->numEdges;
-        }
-    };
+        numEdges = numofedges;
+    }
+    std::vector<std::vector<int>> Graph::getAdjacencyMatrix()
+    {
+        return adjacencyMatrix;
+    }
+    void printGraph()
+    {
+        cout << "Graph with " << numVertices << " vertices and " << numEdges << " edges." << endl;
+    }
+    int Graph::getNumVertices()
+    {
+        return this->numVertices;
+    }
+    int Graph::getNumEdges()
+    {
+        return this->numEdges;
+    }
 }
