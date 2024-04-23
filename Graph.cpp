@@ -35,7 +35,7 @@ namespace ariel
                 }
             }
         }
-        numEdges = numofedges;
+        numEdges = (unsigned long )numofedges;
     }
     std::vector<std::vector<int>> Graph::getAdjacencyMatrix()
     {

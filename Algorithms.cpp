@@ -11,7 +11,7 @@ namespace ariel
         int vertex;
         int prev;
     };
-    bool isContainsCycle(Graph &g)
+    static bool isContainsCycle(Graph g)
     {
         std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
         unsigned int V = (unsigned int)g.getNumVertices();        // Get the number of vertices in the graph
@@ -69,7 +69,7 @@ namespace ariel
         cout << "0" << endl;
         return false;
     }
-    int isConnected(ariel::Graph &g)
+    int isConnected(ariel::Graph g)
     {
         std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
         for (unsigned long i = 0; i < G.size(); i++)
@@ -84,7 +84,7 @@ namespace ariel
         }
         return 1;
     }
-    string shortestPath(ariel::Graph &g, int start, int end)
+    static string shortestPath(ariel::Graph &g, int start, int end)
     {
         unsigned int V = (unsigned int)g.getNumVertices(); // Get the number of vertices in the graph
         // Create a distance vector and initialize all distances as infinite (except source)
@@ -146,7 +146,7 @@ namespace ariel
 
         return shortestPath;
     }
-    string isBipartite(ariel::Graph &g)
+    static string isBipartite(ariel::Graph g)
     {
         if (g.getNumVertices() == 0)
         {
@@ -225,7 +225,7 @@ namespace ariel
             return result;
         }
     }
-    string negativeCycle(ariel::Graph &g)
+     static string negativeCycle(ariel::Graph g)
     {
         unsigned int V = (unsigned int)g.getNumVertices();        // Get the number of vertices in the graph
         std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
