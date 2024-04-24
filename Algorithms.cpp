@@ -11,80 +11,100 @@ namespace ariel
         int vertex;
         int prev;
     };
-    static bool isContainsCycle(Graph g)
-    {
-        std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
-        unsigned int V = (unsigned int)g.getNumVertices();        // Get the number of vertices in the graph
-        // Function to check if a graph contains a positive cycle using DFS
-        vector<bool> visited(V, false);
-        stack<PathNode> dfsStack; // Stack for DFS traversal
-        // Perform DFS for each unvisited vertex
-        for (int i = 0; i < (signed int)V; ++i)
-        {
-            if (!visited[(unsigned long)i])
-            {
-                dfsStack.push({i, -1}); // Start with no parent for the first vertex
-                while (!dfsStack.empty())
-                {
-                    PathNode curr = dfsStack.top();
-                    dfsStack.pop();
+    bool DFSUtil(ariel::Graph graph, int v, std::vector<bool>& visited); // Declare the DFSUtil function
+    bool dfsForCycle( const std::vector<std::vector< int>>& G, std::vector<bool>& visited, std::vector<int>& parent, int curr); // Declare the dfsForCycle function
+    bool Algorithms::isContainsCycle(Graph g) {
+  std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get adjacency matrix
+unsigned long V = (unsigned long)g.getNumVertices();      // Get number of vertices
 
-                    if (visited[(unsigned long)curr.vertex])
-                    {
-                        // Cycle found if visited and not the parent in DFS tree
-                        if (curr.vertex != curr.prev)
-                        {
-                            string cycleString;
-                            cycleString += to_string(curr.vertex);
-                            // Backtrack to reconstruct the cycle path
-                            PathNode backtrack = curr;
-                            while (backtrack.prev != -1)
-                            {
-                                cycleString = to_string(backtrack.prev) + " -> " + cycleString;
-                                backtrack = dfsStack.top();
-                                dfsStack.pop();
-                            }
-                            cycleString = to_string(backtrack.vertex) + " -> " + cycleString;
+// Replace stack with two vectors for visited and parent tracking
+std::vector<bool> visited(V, false);
+std::vector<int> parent(V, -1);  // -1 indicates no parent (root)
 
-                            cout << "Positive cycle found: " << cycleString << endl;
-                            return true; // Terminate after finding a cycle (optional)
-                        }
-                    }
-                    else
-                    {
-                        visited[(unsigned long)curr.vertex] = true;
-                        // Explore unvisited neighbors
-                        for (int neighbor : G[(unsigned long)curr.vertex])
-                        {
-                            if (!visited[(unsigned long)neighbor])
-                            {
-                                dfsStack.push({neighbor, curr.vertex}); // Neighbor becomes child
-                            }
-                        }
-                    }
-                }
-            }
+// Perform DFS for each unvisited vertex
+for (int i = 0; i < V; ++i) {
+    if (!visited[(unsigned long)i]) {
+       const std::vector<std::vector<int>>& adjacencyMatrix =  g.getAdjacencyMatrix(); // Get adjacency matrix
+        if (dfsForCycle(adjacencyMatrix, visited, parent, i)) {
+            // Cycle found
+            return true;
         }
-        // No cycle found
-        cout << "0" << endl;
-        return false;
     }
-    int isConnected(ariel::Graph g)
+}
+
+  // No cycle found
+  return false;
+}
+
+// DFS function using recursion and tracking parent for cycle detection
+bool dfsForCycle( const std::vector<std::vector<int >>& G, std::vector<bool>& visited, std::vector<int>& parent, int curr) {
+  visited[(unsigned long)curr] = true;
+  // Explore unvisited neighbors
+  for (unsigned long neighbor : G[(unsigned long)curr]) {
+    if (!visited[neighbor]) {
+      parent[neighbor] = curr;  // Track parent for cycle check
+      if (dfsForCycle(G, visited, parent, neighbor)) {
+        return true;  // Cycle found in a recursive call
+      }
+    } else if (neighbor != parent[(unsigned long)curr]) {
+      // Cycle found if visited and not the parent in DFS tree
+      return true;
+    }
+  }
+
+  return false;  // No cycle found in subtree rooted at curr
+}
+    int Algorithms::isConnected(ariel::Graph g)
     {
-        std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
-        for (unsigned long i = 0; i < G.size(); i++)
-        {
-            for (unsigned long j = 0; j < G[0].size(); j++)
-            {
-                if (G[i][j] == 0 && G[j][i] == 0)
-                {
-                    return 0;
-                }
-            }
-        }
-        return 1;
+          int V = g.getNumVertices(); // Number of vertices in the graph
+
+  // Create a visited array to keep track of visited nodes
+  std::vector<bool> visited((unsigned long)V, false);
+
+  // DFS traversal from an arbitrary vertex
+  if (!DFSUtil(g, 0, visited)) {
+    return 0; // Graph is not connected if a vertex is not reachable
+  }
+
+  // Since the graph might be directed, we need to repeat DFS
+  // for a vertex from each disconnected component explored in the first pass
+  for (int i = 0; i < V; ++i) {
+    if (!visited[(unsigned long)i]) {
+      return 0; // If a vertex is still unvisited, the graph is not connected
     }
-    static string shortestPath(ariel::Graph &g, int start, int end)
+  }
+
+  return 1; // Graph is connected
+}
+std::vector<int>  Algorithms::getNeighbors(Graph g,unsigned long vertex)  {
+    int V = g.getNumVertices();// Get the number of vertices from the matrix size
+    std::vector<int> neighborsList;
+    std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
+    // Iterate through all vertices in the adjacency matrix row for the given vertex
+    for (int neighbor = 0; neighbor < V; ++neighbor) {
+        if (G[vertex][(unsigned long)neighbor] == 1) { // Check for an edge (connection)
+            neighborsList.push_back(neighbor);
+        }
+    }
+
+    return neighborsList;
+}
+// Recursive DFS helper function
+
+bool DFSUtil(ariel::Graph graph, int v, std::vector<bool>& visited) {
+    visited[(unsigned long)v] = true; // Mark the current node as visited
+    unsigned long V = (unsigned long)graph.getNumVertices(); // Get the number of vertices in the graph
+    // Recur for all adjacent vertices
+    std::vector<int> neighbors = Algorithms::getNeighbors(graph,(unsigned long) v); // Call the getNeighbors function
+    for (int neighbor : neighbors) { // Iterate over the elements of the neighbors vector
+        if (!visited[(unsigned long)neighbor]) {
+            DFSUtil(graph, neighbor, visited);
+        }
+    }
+
+    return true; // All reachable nodes have been visited
+}
+     string Algorithms::shortestPath(ariel::Graph &g, int start, int end)
     {
         unsigned int V = (unsigned int)g.getNumVertices(); // Get the number of vertices in the graph
         // Create a distance vector and initialize all distances as infinite (except source)
@@ -146,7 +166,7 @@ namespace ariel
 
         return shortestPath;
     }
-    static string isBipartite(ariel::Graph g)
+     string Algorithms::isBipartite(ariel::Graph g)
     {
         if (g.getNumVertices() == 0)
         {
@@ -225,7 +245,7 @@ namespace ariel
             return result;
         }
     }
-     static string negativeCycle(ariel::Graph g)
+      string Algorithms::negativeCycle(ariel::Graph g)
     {
         unsigned int V = (unsigned int)g.getNumVertices();        // Get the number of vertices in the graph
         std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph

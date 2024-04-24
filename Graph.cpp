@@ -17,7 +17,7 @@ namespace ariel
         // Check if the graph is a square matrix.
         if (g.size() == g[0].size())
         {
-            this->numVertices = g.size();
+            numVertices = g.size();
         }
         else
         {
@@ -29,19 +29,19 @@ namespace ariel
         {
             for (unsigned long j = 0; j < numVertices; j++)
             {
-                if (adjacencyMatrix[i][j] != 0)
+                if (adjacencyMatrix[i][j] != 0 && adjacencyMatrix[j][i]!=0) 
                 {
                     numofedges++;
                 }
             }
         }
-        numEdges = (unsigned long )numofedges;
+        numEdges = (unsigned long )numofedges/2;
     }
     std::vector<std::vector<int>> Graph::getAdjacencyMatrix()
     {
         return adjacencyMatrix;
     }
-    void printGraph()
+    void Graph::printGraph()
     {
         cout << "Graph with " << numVertices << " vertices and " << numEdges << " edges." << endl;
     }
