@@ -1,4 +1,5 @@
-Absolutely, here is the README file for your project, including a minor grammatical error:
+Hi there, this is a little bit of explaining about this project:
+we have some files here but I'll go thrugh what I think is necessary
 
 **Algorithms.hpp**
 
