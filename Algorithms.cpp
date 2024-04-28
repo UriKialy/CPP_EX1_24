@@ -11,9 +11,7 @@ namespace ariel
         int vertex;
         int prev;
     };
-    bool DFSUtil(ariel::Graph graph, int v, std::vector<bool>& visited); // Declare the DFSUtil function
-    bool dfsForCycle( const std::vector<std::vector< int>>& G, std::vector<bool>& visited, std::vector<int>& parent, int curr); // Declare the dfsForCycle function
-    bool Algorithms::isContainsCycle(Graph g) {
+bool Algorithms::isContainsCycle(Graph g) {
   std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get adjacency matrix
 unsigned long V = (unsigned long)g.getNumVertices();      // Get number of vertices
 
@@ -25,7 +23,7 @@ std::vector<int> parent(V, -1);  // -1 indicates no parent (root)
 for (int i = 0; i < V; ++i) {
     if (!visited[(unsigned long)i]) {
        const std::vector<std::vector<int>>& adjacencyMatrix =  g.getAdjacencyMatrix(); // Get adjacency matrix
-        if (dfsForCycle(adjacencyMatrix, visited, parent, i)) {
+        if (dfsForCycle((std::vector<std::vector<size_t>>&)adjacencyMatrix, visited, parent, i)) {
             // Cycle found
             return true;
         }
@@ -36,21 +34,21 @@ for (int i = 0; i < V; ++i) {
   return false;
 }
 
-// DFS function using recursion and tracking parent for cycle detection
-bool dfsForCycle( const std::vector<std::vector<int >>& G, std::vector<bool>& visited, std::vector<int>& parent, int curr) {
+bool Algorithms::dfsForCycle(std::vector<std::vector<size_t>>& G, std::vector<bool>& visited, std::vector<int>& parent, int curr) {
   visited[(unsigned long)curr] = true;
-  // Explore unvisited neighbors
-  for (unsigned long neighbor : G[(unsigned long)curr]) {
+// Explore unvisited neighbors
+for (unsigned long i = 0; i < G[(unsigned long)curr].size(); ++i) {
+    size_t neighbor = G[(unsigned long)curr][i];
     if (!visited[neighbor]) {
-      parent[neighbor] = curr;  // Track parent for cycle check
-      if (dfsForCycle(G, visited, parent, neighbor)) {
-        return true;  // Cycle found in a recursive call
-      }
+        parent[neighbor] = curr;  // Track parent for cycle check
+        if (dfsForCycle(G, visited, parent, neighbor)) {
+            return true;  // Cycle found in a recursive call
+        }
     } else if (neighbor != parent[(unsigned long)curr]) {
-      // Cycle found if visited and not the parent in DFS tree
-      return true;
+        // Cycle found if visited and not the parent in DFS tree
+        return true;
     }
-  }
+}
 
   return false;  // No cycle found in subtree rooted at curr
 }
@@ -89,9 +87,8 @@ std::vector<int>  Algorithms::getNeighbors(Graph g,unsigned long vertex)  {
 
     return neighborsList;
 }
-// Recursive DFS helper function
 
-bool DFSUtil(ariel::Graph graph, int v, std::vector<bool>& visited) {
+bool Algorithms::DFSUtil(ariel::Graph graph, int v, std::vector<bool>& visited) {
     visited[(unsigned long)v] = true; // Mark the current node as visited
     unsigned long V = (unsigned long)graph.getNumVertices(); // Get the number of vertices in the graph
     // Recur for all adjacent vertices

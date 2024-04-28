@@ -25,6 +25,13 @@ namespace ariel{
 
     // this function will return the MST of the graph as a string.  
     static std::vector<int> getNeighbors(Graph graph,unsigned long vertex);
+
+    // Recursive DFS helper function
+    static bool DFSUtil(ariel::Graph graph, int v, std::vector<bool>& visited); 
+    
+    // DFS function using recursion and tracking parent for cycle detection
+    static bool dfsForCycle(std::vector<std::vector<size_t>>& G, std::vector<bool>& visited, std::vector<int>& parent, int curr);
+   
 };
 }
 #endif
