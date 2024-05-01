@@ -80,9 +80,9 @@ std::vector<int>  Algorithms::getNeighbors(Graph g,int vertex)  {
     std::vector<int> neighborsList;
     std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
     // Iterate through all vertices in the adjacency matrix row for the given vertex
-    (size_t)vertex;
-    for (size_t neighbor = 0; neighbor < V; ++neighbor) {
-        if (G[(unsigned long)vertex][neighbor] == 1) { // Check for an edge (connection)
+    unsigned long v =(unsigned long)vertex;
+    for (unsigned long neighbor = 0; neighbor < V; ++neighbor) {
+        if (G[v][neighbor] == 1) { // Check for an edge (connection)
             neighborsList.push_back(neighbor);
         }
     }
@@ -103,12 +103,12 @@ bool Algorithms::DFSUtil(ariel::Graph graph, size_t v, std::vector<bool>& visite
 }
      string Algorithms::shortestPath(ariel::Graph &g, int start, int end)
     {
-        (size_t)start;
-        (size_t)end;
+        size_t s=(size_t)start;
+        size_t e=(size_t)end;
         size_t V = (size_t)g.getNumVertices(); // Get the number of vertices in the graph
         // Create a distance vector and initialize all distances as infinite (except source)
         vector<int> dist(V, numeric_limits<int>::max());
-        dist[start] = 0; // Distance from source to itself is 0
+        dist[(unsigned long)s] = 0; // Distance from source to itself is 0
         // Create a predecessor vector to store the previous node in the shortest path
         vector<int> prev(V, -1);
         std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
@@ -141,17 +141,17 @@ bool Algorithms::DFSUtil(ariel::Graph graph, size_t v, std::vector<bool>& visite
             }
         }
         // Reconstruct the shortest path using predecessor information (if destination is reachable)
-        if (dist[end] == numeric_limits<int>::max())
+        if (dist[e] == numeric_limits<int>::max())
         {
             return "-1";
         }
 
         stack<int> path;
-        size_t current = end;
+        size_t current = (size_t)end;
         while (current != -1)
         {
             path.push(current);
-            current = prev[current];
+            current = (size_t)prev[current];
         }
 
         // Build the path string from the reconstructed path
@@ -160,7 +160,7 @@ bool Algorithms::DFSUtil(ariel::Graph graph, size_t v, std::vector<bool>& visite
         {
             int vertex = path.top();
             path.pop();
-            shortestPath += to_string(vertex) + (path.empty() ? "" : " -> ");
+            shortestPath += to_string(vertex) + (path.empty() ? "" : "-> ");
         }
 
         return shortestPath;
@@ -279,12 +279,12 @@ bool Algorithms::DFSUtil(ariel::Graph graph, size_t v, std::vector<bool>& visite
                     // Negative cycle detected
                     // Use a stack to track the cycle
                     stack<int> cycle;
-                    int current = v;
+                    size_t current =(size_t) v;
                     // Find the starting vertex of the cycle (loop)
                     do
                     {
                         cycle.push(current);
-                        current = prev[current];
+                        current = (size_t)prev[current];
                     } while (current != -1 && current != cycle.top());
 
                     // Build the cycle string if a loop is found (not used here)
