@@ -3,8 +3,8 @@
 using namespace std;
 namespace ariel
 {
-    unsigned long numVertices;
-    unsigned long numEdges;
+    int numVertices;
+    int numEdges;
     std::vector<std::vector<int>> adjacencyMatrix;
     Graph::Graph()
     {
@@ -25,9 +25,9 @@ namespace ariel
         }
         adjacencyMatrix = g;// Load the mstrix to the graph 
         int numofedges = 0;
-        for (unsigned long i = 0; i < numVertices; i++)
+        for (size_t i = 0; i < numVertices; i++)
         {
-            for (unsigned long j = 0; j < numVertices; j++)
+            for (size_t j = 0; j < numVertices; j++)
             {
                 if (adjacencyMatrix[i][j] != 0 && adjacencyMatrix[j][i]!=0) 
                 {
@@ -35,7 +35,7 @@ namespace ariel
                 }
             }
         }
-        numEdges = (unsigned long )numofedges/2;
+        numEdges = (int )numofedges/2;
     }
     std::vector<std::vector<int>> Graph::getAdjacencyMatrix()
     {

@@ -9,8 +9,8 @@ namespace ariel
     class Graph
     {
         vector<vector<int>> adjacencyMatrix;
-        unsigned long numVertices;
-         unsigned long numEdges;
+        int numVertices;
+        int numEdges;
     public:
         Graph();
 
