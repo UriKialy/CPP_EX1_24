@@ -1,29 +1,43 @@
-# מטלה 1 - גרפים (Classes and Namespaces)
+Hi there, this is a little bit of explaining about this project:
+we have some files here but I'll go thrugh what I think is necessary
 
-המטרה שלכם במטלה הזאת היא ליצור מחלקה שמייצגת גרף ולממש אלגוריתמים על הגרפים (זה הזמן להזכר בקורס אלגוריתמים 1).
+**Algorithms.hpp**
 
-במטלה הזאת הייצוג של הגרף שלכם יתבצע בעזרת מטריצת שכנויות - https://he.wikipedia.org/wiki/%D7%9E%D7%98%D7%A8%D7%99%D7%A6%D7%AA_%D7%A9%D7%9B%D7%A0%D7%95%D7%AA.
+This header file defines the `Algorithms` class which provides various graph algorithms implemented in C++.
 
-הגרף יכול להיות גרף מכוון ולא מכוון וגם גרף ממושקל. מטריצת השכנויות חייבת להיות מטריצה ריבועית.
+**Includes**
 
-עליכם לכתוב את הקבצים הבאים:
+* `<vector>`: Provides functionalities for dynamic arrays.
+* `<iostream>`: Provides functionalities for input and output streams.
+* `<bits/stdc++.h>`: Includes commonly used functionalities from the C++ Standard Library.
+* `Graph.hpp`: Includes the definition of the `Graph` class.
+* `<string>`: Provides string manipulation functionalities.
 
+**Namespace**
+
+* `ariel`: Encapsulates the functionalities within the `ariel` namespace.
+
+**Class: Algorithms**
+
+This class provides various graph algorithms:
+
+* `isConnected(Graph g)`: Checks if a graph is connected and returns 1 if it is, 0 otherwise.
+* `shortestPath(Graph &g, int start, int end)`: Finds the shortest path between two vertices in a graph and returns it as a string. If there is no path, it returns an empty string.
+* `isContainsCycle(Graph g)`: Checks if a graph contains a cycle and returns true if it does, false otherwise.
+* `isBipartite(Graph g)`: Checks if a graph is bipartite and returns a string indicating the bipartition or an empty string if the graph is not bipartite.
+* `negativeCycle(Graph g)`: Finds a negative cycle in a graph and returns it as a string. If there is no negative cycle, it returns "no negative cycle".
+* `getNeighbors(Graph graph, unsigned long vertex)`: Gets the list of neighbors for a given vertex in the graph and returns it as a vector.
+
+**Compiling and Running**
+
+The project uses a Makefile to compile and run the code. You can compile the code using the following command:
+
+```bash
+make
 ```
-Graph.cpp
-Algorithms.cpp
+
+This will create an executable named `demo`. You can then run the program using the following command:
+
+```bash
+./demo
 ```
-
-הקובץ `Graph.cpp` מכיל מחלקה המייצגת גרף.
-המחלקה מכילה את הפעולות `loadGraph` המקבלת מטריצת שכנויות וטוענת אותה לתוך הגרף ו-`printGraph` שמדפיסה את הייצוג של הגרף (הפורמט לבחירתכם, ראו דוגמה ב-`Demo.cpp`).
-
-הקובץ `Algorithms.cpp` מכיל מימושים לאלגוריתמים על גרפים. ביניהם:
-
-- `isConnected(g)` - האלגוריתם מקבל גרף ומחזיר 1 אם הגרף קשיר (אחרת מחזיר 0).
-- `shortestPath(g,start,end)` - האלגוריתם מקבל גרף, קודקוד התחלה וקודקוד סיום ומחזיר את המסלול הקל ביותר (במקרה שהגרף לא ממושקל - הקצר ביותר) בין שני הקודקודים. במידה ואין מסלול כזה, האלגוריתם יחזיר -1.
-- `isContainsCycle(g)` - האלגוריתם מקבל גרף ומדפיס מעגל כלשהו. אם לא קיים מעגל בגרף, האלגוריתם יחזיר 0.
-- `isBipartite(g)` - האלגוריתם מקבל גרף ומחזיר את החלוקה של הגרף לגרף דו-צדדי. אם אי אפשר לחלק את הגרף, האלגוריתם יחזיר 0.
-- `negativeCycle(g)` - האלגוריתם מקבל גרף ומוצא מעגל שלילי (כלומר מעגל שסכום המשקלים של הצלעות שלילי). אם לא קיים מעגל כזה, האלגוריתם ידפיס שלא קיים מעגל שלילי.
-
-הקובץ `Demo.cpp` מכיל דוגמאות של קלטים ופלטים.
-עליכם לכתוב בתחילת כל קובץ את מספר תעודת הזהות שלכם ואת המייל. כמו כן, בנוסף לקבצים של המטלה אתם נדרשים להגיש גם קובץ README המתאר את אופן המימוש ואת החלוקה שביצעתם בקוד (סוג של מדריך משתמש). אי עמידה בהנחיות תגרור הפחתה בציון. בהצלחה!
-  
