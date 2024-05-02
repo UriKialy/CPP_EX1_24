@@ -11,147 +11,136 @@ namespace ariel
         int vertex;
         int prev;
     };
-bool Algorithms::isContainsCycle(Graph g) {
-      int numVertices = g.getNumVertices();
-
-  // Create a visited array to keep track of visited vertices
-  vector<bool> visited(numVertices, false);
-
-  // Create a recursion stack to keep track of vertices in the current DFS path
-  stack<int> recursionStack;
-
-  // Function to perform DFS traversal
-  function<bool(int)> dfs = [&](int vertex) {
-    // Mark the current vertex as visited
-    visited[vertex] = true;
-
-    // Push the current vertex to the recursion stack
-    recursionStack.push(vertex);
-
-    // Explore neighbors
-    for (int neighbor : g[vertex]) {
-      if (!visited[neighbor]) {
-        // If neighbor is not visited, recur for it
-        if (dfs(neighbor)) {
-          return true; // Cycle found
+    bool Algorithms::isContainsCycle(Graph g)
+    {
+        if (g.getNumVertices() < 2 || g.getNumEdges() < 2)
+        {
+            return false; // Empty graph or no edges, no cycle
         }
-      } else if (recursionStack.top() != neighbor) {
-        // If neighbor is visited and not present in current DFS path (back edge), cycle found
-        return true;
-      }
+
+        size_t numVertices = (size_t)g.getNumVertices();
+
+        // Create a visited array to keep track of visited vertices
+        vector<bool> visited(numVertices, false);
+
+        // Create a recursion stack to keep track of vertices in the current DFS path
+        stack<int> recursionStack;
+
+        // Function to perform DFS traversal
+        function<bool(int)> dfs = [&](size_t vertex)
+        {
+            // Mark the current vertex as visited
+            visited[vertex] = true;
+
+            // Push the current vertex to the recursion stack
+            recursionStack.push(vertex);
+
+            // Explore neighbors (consider only upper triangular part for undirected graphs)
+            for (size_t neighbor = vertex + 1; neighbor < numVertices; neighbor++)
+            {
+                if (g.getAdjacencyMatrix()[vertex][neighbor] != 0)
+                { // Check for edge
+                    if (!visited[neighbor])
+                    {
+                        // If neighbor is not visited, recur for it
+                        if (dfs(neighbor))
+                        {
+                            return true; // Cycle found
+                        }
+                    }
+                    else if (recursionStack.top() != neighbor)
+                    {
+                        // If neighbor is visited and not present in current DFS path (back edge), cycle found
+                        return true;
+                    }
+                }
+            }
+
+            // Pop the vertex from the recursion stack as we have finished exploring its neighbors
+            recursionStack.pop();
+
+            return false; // No cycle found in this DFS path
+        };
+
+        // Start DFS from each unvisited vertex
+        for (size_t i = 0; i < numVertices; i++)
+        {
+            if (!visited[i])
+            {
+                if (dfs(i))
+                {
+                    return true; // Cycle found in the graph
+                }
+            }
+        }
+
+        // No cycle found
+        return false;
     }
 
-    // Pop the vertex from the recursion stack as we have finished exploring its neighbors
-    recursionStack.pop();
-
-    return false; // No cycle found in this DFS path
-  };
-
-  // Start DFS from each unvisited vertex
-  for (int i = 0; i < numVertices; i++) {
-    if (!visited[i]) {
-      if (dfs(i)) {
-        return true; // Cycle found in the graph
-      }
-    }
-  }
-
-  // No cycle found
-  return false;
-}
-//   std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get adjacency matrix
-// size_t V = (size_t)g.getNumVertices();      // Get number of vertices
-
-// // Replace stack with two vectors for visited and parent tracking
-// std::vector<bool> visited(V, false);
-// std::vector<int> parent(V, -1);  // -1 indicates no parent (root)
-
-// // Perform DFS for each unvisited vertex
-// for (size_t i = 0; i < V; ++i) {
-//     if (!visited[i]) {
-//        const std::vector<std::vector<int>>& adjacencyMatrix =  g.getAdjacencyMatrix(); // Get adjacency matrix
-//         if (dfsForCycle((std::vector<std::vector<size_t>>&)adjacencyMatrix, visited, parent, i)) {
-//             // Cycle found
-//             return true;
-//         }
-//     }
-// }
-
-//   // No cycle found
-//   return false;
-// }
-
-// bool Algorithms::dfsForCycle(std::vector<std::vector<size_t>>& G, std::vector<bool>& visited, std::vector<int>& parent, size_t curr) {
-//   visited[curr] = true;
-// // Explore unvisited neighbors
-// for (size_t i = 0; i < G[curr].size(); ++i) {
-//     // size_t neighbor = G[curr][i];
-//     if (!visited[i]) {
-//         parent[i] = curr;  // Track parent for cycle check
-//         if (dfsForCycle(G, visited, parent, i)) {
-//             return true;  // Cycle found in a recursive call
-//         }
-//     } else if (i != parent[curr]) {
-//         // Cycle found if visited and not the parent in DFS tree
-//         return true;
-//     }
-// }
-
-//   return false;  // No cycle found in subtree rooted at curr
-// }
+    
     int Algorithms::isConnected(ariel::Graph g)
     {
-          size_t V = (size_t)g.getNumVertices(); // Number of vertices in the graph
+        size_t V = (size_t)g.getNumVertices(); // Number of vertices in the graph
 
-  // Create a visited array to keep track of visited nodes
-  std::vector<bool> visited(V, false);
+        // Create a visited array to keep track of visited nodes
+        std::vector<bool> visited(V, false);
 
-  // DFS traversal from an arbitrary vertex
-  if (!DFSUtil(g, 0, visited)) {
-    return 0; // Graph is not connected if a vertex is not reachable
-  }
-
-  // Since the graph might be directed, we need to repeat DFS
-  // for a vertex from each disconnected component explored in the first pass
-  for (size_t i = 0; i < V; ++i) {
-    if (!visited[i]) {
-      return 0; // If a vertex is still unvisited, the graph is not connected
-    }
-  }
-
-  return 1; // Graph is connected
-}
-std::vector<int>  Algorithms::getNeighbors(Graph g,int vertex)  {
-    
-    size_t V = (size_t)g.getNumVertices();// Get the number of vertices from the matrix size
-    std::vector<int> neighborsList;
-    std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
-    // Iterate through all vertices in the adjacency matrix row for the given vertex
-    unsigned long v =(unsigned long)vertex;
-    for (unsigned long neighbor = 0; neighbor < V; ++neighbor) {
-        if (G[v][neighbor] == 1) { // Check for an edge (connection)
-            neighborsList.push_back(neighbor);
+        // DFS traversal from an arbitrary vertex
+        if (!DFSUtil(g, 0, visited))
+        {
+            return 0; // Graph is not connected if a vertex is not reachable
         }
-    }
-    return neighborsList;
-}
-bool Algorithms::DFSUtil(ariel::Graph graph, size_t v, std::vector<bool>& visited) {
-    visited[v] = true; // Mark the current node as visited
-    size_t V = (size_t)graph.getNumVertices(); // Get the number of vertices in the graph
-    // Recur for all adjacent vertices
-    std::vector<int> neighbors = Algorithms::getNeighbors(graph, static_cast<size_t>(v)); // Call the getNeighbors function
-    std::vector<size_t> castedNeighbors(neighbors.begin(), neighbors.end()); // Cast the neighbors vector to std::vector<size_t>
-    for (size_t neighbor : castedNeighbors) { // Iterate over the elements of the castedNeighbors vector
-        if (!visited[neighbor]) {
-            DFSUtil(graph, neighbor, visited);
+
+        // Since the graph might be directed, we need to repeat DFS
+        // for a vertex from each disconnected component explored in the first pass
+        for (size_t i = 0; i < V; ++i)
+        {
+            if (!visited[i])
+            {
+                return 0; // If a vertex is still unvisited, the graph is not connected
+            }
         }
+
+        return 1; // Graph is connected
     }
-    return true; // All reachable nodes have been visited
-}
-     string Algorithms::shortestPath(ariel::Graph &g, int start, int end)
+    std::vector<int> Algorithms::getNeighbors(Graph g, int vertex)
     {
-        size_t s=(size_t)start;
-        size_t e=(size_t)end;
+
+        size_t V = (size_t)g.getNumVertices(); // Get the number of vertices from the matrix size
+        std::vector<int> neighborsList;
+        std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
+        // Iterate through all vertices in the adjacency matrix row for the given vertex
+        unsigned long v = (unsigned long)vertex;
+        for (unsigned long neighbor = 0; neighbor < V; ++neighbor)
+        {
+            if (G[v][neighbor] == 1)
+            { // Check for an edge (connection)
+                neighborsList.push_back(neighbor);
+            }
+        }
+        return neighborsList;
+    }
+    bool Algorithms::DFSUtil(ariel::Graph graph, size_t v, std::vector<bool> &visited)
+    {
+        visited[v] = true;                         // Mark the current node as visited
+        size_t V = (size_t)graph.getNumVertices(); // Get the number of vertices in the graph
+        // Recur for all adjacent vertices
+        std::vector<int> neighbors = Algorithms::getNeighbors(graph, static_cast<size_t>(v)); // Call the getNeighbors function
+        std::vector<size_t> castedNeighbors(neighbors.begin(), neighbors.end());              // Cast the neighbors vector to std::vector<size_t>
+        for (size_t neighbor : castedNeighbors)
+        { // Iterate over the elements of the castedNeighbors vector
+            if (!visited[neighbor])
+            {
+                DFSUtil(graph, neighbor, visited);
+            }
+        }
+        return true; // All reachable nodes have been visited
+    }
+    string Algorithms::shortestPath(ariel::Graph &g, int start, int end)
+    {
+        size_t s = (size_t)start;
+        size_t e = (size_t)end;
         size_t V = (size_t)g.getNumVertices(); // Get the number of vertices in the graph
         // Create a distance vector and initialize all distances as infinite (except source)
         vector<int> dist(V, numeric_limits<int>::max());
@@ -212,88 +201,282 @@ bool Algorithms::DFSUtil(ariel::Graph graph, size_t v, std::vector<bool>& visite
 
         return shortestPath;
     }
-     string Algorithms::isBipartite(ariel::Graph g)
+
+
+
+
+
+/*
+
+   string Algorithms::isBipartite(ariel::Graph g)
     {
-        if (g.getNumVertices() == 0)
+        if (g.getNumVertices() < 2 || g.getNumEdges() < 2)
         {
             return "The graph is bipartite: A={}, B={}.";
         }
         else
         {
             size_t V = (size_t)g.getNumVertices();
-            // Create a color vector to store colors assigned to vertices.
-            // 0 - Uncolored, 1 - Red, -1 - Blue
-            vector<int> color(V, 0);
-            std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
-            // BFS to check if any odd-length cycle exists (not bipartite)
-            for (size_t u = 0; u < V; ++u)
-            {
-                if (color[u] == 0)
-                {
-                    queue<size_t> q;
-                    color[u] = 1; // Assign starting color (Red)
-                    q.push(u);
-                    while (!q.empty())
-                    {
-                        size_t v = q.front();
-                        q.pop();
 
-                        // Check for adjacent vertices
-                        for (size_t w = 0; w < V; ++w)
+            // Check if the graph is directed
+            bool isDirected = Algorithms::isDirected(g);
+
+            // Handle directed graphs (bipartite directed case)
+            if (isDirected)
+            {
+                // Initialize two sets to store vertices
+                std::vector<int> set1, set2;
+
+                // Iterate through vertices
+                for (size_t u = 0; u < V; ++u)
+                {
+                    bool foundInSet1 = false, foundInSet2 = false;
+
+                    // Check if the vertex belongs to any existing set
+                    for (size_t v = 0; v < V; ++v)
+                    {
+                        if (g.getAdjacencyMatrix()[v][u] != 0)
                         {
-                            if (G[v][w] != 0)
+                            // Found an incoming edge, vertex belongs to set2
+                            foundInSet2 = true;
+                            break;
+                        }
+                    }
+
+                    // If no incoming edge found, check for outgoing edges
+                    if (!foundInSet2)
+                    {
+                        for (size_t v = 0; v < V; ++v)
+                        {
+                            if (g.getAdjacencyMatrix()[u][v] != 0)
                             {
-                                if (color[w] == 0)
-                                {
-                                    color[w] = -color[v]; // Assign opposite color (Blue)
-                                    q.push(w);
-                                }
-                                else if (color[w] == color[v])
-                                {
-                                    // Adjacent vertices with same color (odd-length cycle)
-                                    return "0"; // Not bipartite
-                                }
+                                // Found an outgoing edge, vertex belongs to set1
+                                foundInSet1 = true;
+                                break;
                             }
                         }
                     }
-                }
-            }
-            // Separate vertices based on colors (assuming colors 1 and -1)
-            vector<int> group1, group2;
-            for (size_t i = 0; i < V; ++i)
-            {
-                if (color[i] == 1)
-                {
-                    group1.push_back(i);
-                }
-                else
-                {
-                    group2.push_back(i);
-                }
-            }
-            std::string result = "The graph is bipartite: A={";
-            for (int vertex : group1)
-            {
-                result += std::to_string(vertex) + ", ";
-            }
-            // Remove trailing comma and space from group A
-            result.erase(result.length() - 2, 2);
 
-            result += "}, B={";
-            for (int vertex : group2)
-            {
-                result += std::to_string(vertex) + ", ";
-            }
-            // Remove trailing comma and space from group B
-            result.erase(result.length() - 2, 2);
+                    // Invalid graph - vertex has no incoming or outgoing edges
+                    if (!foundInSet1 && !foundInSet2)
+                    {
+                        return "Invalid directed graph: Vertex has no incoming or outgoing edges.";
+                    }
 
-            result += "}";
-            return result;
+                    // Add vertex to the appropriate set
+                    if (foundInSet1)
+                    {
+                        set1.push_back(u);
+                    }
+                    else
+                    {
+                        set2.push_back(u);
+                    }
+                }
+
+                // Build the result string for bipartite directed graph
+                std::string result = "The graph is bipartite directed: A={";
+                for (int vertex : set1)
+                {
+                    result += std::to_string(vertex) + ", ";
+                }
+                // Remove trailing comma and space from set A
+                if (!set1.empty())
+                    result.erase(result.length() - 2);
+
+                result += "}, B={";
+                for (int vertex : set2)
+                {
+                    result += std::to_string(vertex) + ", ";
+                }
+                // Remove trailing comma and space from set B
+                if (!set2.empty())
+                    result.erase(result.length() - 2);
+
+                result += "}";
+                return result;
+            }
+            else
+            {
+                // Handle undirected graphs using the existing logic
+                // ... (rest of the code for bipartite detection in undirected graphs remains the same)
+            }
         }
     }
-      string Algorithms::negativeCycle(ariel::Graph g)
+  
+*/
+
+
+    string Algorithms::isBipartite(ariel::Graph g) {
+     if (g.getNumVertices() == 0) {
+     return "The graph is bipartite: A={}, B={}."; // Empty graph is bipartite
+   } else {
+     size_t V = (size_t)g.getNumVertices();
+
+     // Create a color vector to store colors assigned to vertices.
+     // 0 - Uncolored, 1 - Red, -1 - Blue
+     vector<int> color(V, 0);
+
+     // Get the adjacency matrix of the graph
+     std::vector<std::vector<int>> G = g.getAdjacencyMatrix();
+
+     // BFS to check if any odd-length cycle exists (not bipartite)
+     for (size_t u = 0; u < V; ++u) {
+       if (color[u] == 0) {
+         queue<size_t> q;
+         color[u] = 1; // Assign starting color (Red)
+         q.push(u);
+         while (!q.empty()) {
+           size_t v = q.front();
+           q.pop();
+
+           // Check for adjacent vertices
+           for (size_t w = 0; w < V; ++w) {
+             if (G[v][w] != 0) {
+               if (color[w] == 0) {
+                 color[w] = -color[v]; // Assign opposite color (Blue)
+                 q.push(w);
+               } else if (color[w] == color[v]) {
+                 // Adjacent vertices with same color (odd-length cycle)
+                 return "0"; // Not bipartite
+               }
+             }
+           }
+         }
+       }
+     }
+
+     // Separate vertices based on colors (assuming colors 1 and -1)
+     vector<int> group1, group2;
+     for (size_t i = 0; i < V; ++i) {
+       if (color[i] == 1) {
+         group1.push_back(i);
+       } else {
+         group2.push_back(i);
+       }
+     }
+
+     // Construct the output string efficiently (avoid string concatenation)
+     std::stringstream result;
+     result << "The graph is bipartite: ";
+
+     if (!group1.empty()) {
+       result << "A={";
+       bool firstVertex1 = true;
+       for (int vertex : group1) {
+         if (firstVertex1) {
+           result << vertex;
+           firstVertex1 = false;
+         } else {
+           result << ", " << vertex;
+         }
+       }
+       result << "}";
+     }
+
+     if (!group2.empty()) {
+       if (!group1.empty()) {
+         result << ", "; // Add comma only if both groups have elements
+       }
+       result << "B={";
+       bool firstVertex2 = true;
+       for (int vertex : group2) {
+         if (firstVertex2) {
+           result << vertex;
+           firstVertex2 = false;
+         } else {
+           result << ", " << vertex;
+         }
+       }
+       result << "}";
+     }
+
+     return result.str();
+   }
+ 
+
+     {
+         if (g.getNumVertices() == 0)
+         {
+             return "The graph is bipartite: A={}, B={}.";
+         }
+         else
+         {
+             size_t V = (size_t)g.getNumVertices();
+             // Create a color vector to store colors assigned to vertices.
+             // 0 - Uncolored, 1 - Red, -1 - Blue
+             vector<int> color(V, 0);
+             std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
+             // BFS to check if any odd-length cycle exists (not bipartite)
+             for (size_t u = 0; u < V; ++u)
+             {
+                 if (color[u] == 0)
+                 {
+                     queue<size_t> q;
+                     color[u] = 1; // Assign starting color (Red)
+                     q.push(u);
+                     while (!q.empty())
+                     {
+                         size_t v = q.front();
+                         q.pop();
+
+                         // Check for adjacent vertices
+                         for (size_t w = 0; w < V; ++w)
+                         {
+                             if (G[v][w] != 0)
+                             {
+                                 if (color[w] == 0)
+                                 {
+                                     color[w] = -color[v]; // Assign opposite color (Blue)
+                                     q.push(w);
+                                 }
+                                 else if (color[w] == color[v])
+                                 {
+                                     // Adjacent vertices with same color (odd-length cycle)
+                                     return "0"; // Not bipartite
+                                 }
+                             }
+                         }
+                     }
+                 }
+             }
+             // Separate vertices based on colors (assuming colors 1 and -1)
+             vector<int> group1, group2;
+             for (size_t i = 0; i < V; ++i)
+             {
+                 if (color[i] == 1)
+                 {
+                     group1.push_back(i);
+                 }
+                 else
+                 {
+                     group2.push_back(i);
+                 }
+             }
+             std::string result = "The graph is bipartite: A={";
+             for (int vertex : group1)
+             {
+                 result += std::to_string(vertex) + ", ";
+             }
+             // Remove trailing comma and space from group A
+             result.erase(result.length() - 2, 2);
+
+             result += "}, B={";
+             for (int vertex : group2)
+             {
+                 result += std::to_string(vertex) + ", ";
+             }
+             // Remove trailing comma and space from group B
+             result.erase(result.length() - 2, 2);
+
+             result += "}";
+             return result;
+         }
+     }
+    }  
+    string Algorithms::negativeCycle(ariel::Graph g)
     {
-        size_t V = (size_t)g.getNumVertices();        // Get the number of vertices in the graph
+        size_t V = (size_t)g.getNumVertices();                    // Get the number of vertices in the graph
         std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
         // Create a distance vector and initialize all distances as infinite
         vector<int> dist(V, numeric_limits<int>::max());
@@ -326,7 +509,7 @@ bool Algorithms::DFSUtil(ariel::Graph graph, size_t v, std::vector<bool>& visite
                     // Negative cycle detected
                     // Use a stack to track the cycle
                     stack<int> cycle;
-                    size_t current =(size_t) v;
+                    size_t current = (size_t)v;
                     // Find the starting vertex of the cycle (loop)
                     do
                     {
@@ -356,5 +539,22 @@ bool Algorithms::DFSUtil(ariel::Graph graph, size_t v, std::vector<bool>& visite
         }
         // No negative cycle found
         return "No negative cycle found";
+    }
+
+    bool Algorithms::isDirected(Graph g)
+    {
+        size_t V = (size_t)g.getNumVertices();                    // Get the number of vertices in the graph
+        std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
+        for (size_t i = 0; i < V; ++i)
+        {
+            for (size_t j = 0; j < V; ++j)
+            {
+                if (G[i][j] != G[j][i])
+                {
+                    return true; // Directed graph
+                }
+            }
+        }
+        return false; // Undirected graph
     }
 } // namespace ariel
