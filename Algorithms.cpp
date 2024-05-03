@@ -81,6 +81,10 @@ namespace ariel
     
     int Algorithms::isConnected(ariel::Graph g)
     {
+        if (g.getNumVertices() <1)
+        {
+            return 0; // Empty graph is not connected
+        }
         size_t V = (size_t)g.getNumVertices(); // Number of vertices in the graph
 
         // Create a visited array to keep track of visited nodes
@@ -139,6 +143,10 @@ namespace ariel
     }
     string Algorithms::shortestPath(ariel::Graph &g, int start, int end)
     {
+        if(g.getNumVertices() ==0 || g.getNumEdges() <1)
+        {
+            return "-1";
+        }
         size_t s = (size_t)start;
         size_t e = (size_t)end;
         size_t V = (size_t)g.getNumVertices(); // Get the number of vertices in the graph
@@ -201,110 +209,6 @@ namespace ariel
 
         return shortestPath;
     }
-
-
-
-
-
-/*
-
-   string Algorithms::isBipartite(ariel::Graph g)
-    {
-        if (g.getNumVertices() < 2 || g.getNumEdges() < 2)
-        {
-            return "The graph is bipartite: A={}, B={}.";
-        }
-        else
-        {
-            size_t V = (size_t)g.getNumVertices();
-
-            // Check if the graph is directed
-            bool isDirected = Algorithms::isDirected(g);
-
-            // Handle directed graphs (bipartite directed case)
-            if (isDirected)
-            {
-                // Initialize two sets to store vertices
-                std::vector<int> set1, set2;
-
-                // Iterate through vertices
-                for (size_t u = 0; u < V; ++u)
-                {
-                    bool foundInSet1 = false, foundInSet2 = false;
-
-                    // Check if the vertex belongs to any existing set
-                    for (size_t v = 0; v < V; ++v)
-                    {
-                        if (g.getAdjacencyMatrix()[v][u] != 0)
-                        {
-                            // Found an incoming edge, vertex belongs to set2
-                            foundInSet2 = true;
-                            break;
-                        }
-                    }
-
-                    // If no incoming edge found, check for outgoing edges
-                    if (!foundInSet2)
-                    {
-                        for (size_t v = 0; v < V; ++v)
-                        {
-                            if (g.getAdjacencyMatrix()[u][v] != 0)
-                            {
-                                // Found an outgoing edge, vertex belongs to set1
-                                foundInSet1 = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    // Invalid graph - vertex has no incoming or outgoing edges
-                    if (!foundInSet1 && !foundInSet2)
-                    {
-                        return "Invalid directed graph: Vertex has no incoming or outgoing edges.";
-                    }
-
-                    // Add vertex to the appropriate set
-                    if (foundInSet1)
-                    {
-                        set1.push_back(u);
-                    }
-                    else
-                    {
-                        set2.push_back(u);
-                    }
-                }
-
-                // Build the result string for bipartite directed graph
-                std::string result = "The graph is bipartite directed: A={";
-                for (int vertex : set1)
-                {
-                    result += std::to_string(vertex) + ", ";
-                }
-                // Remove trailing comma and space from set A
-                if (!set1.empty())
-                    result.erase(result.length() - 2);
-
-                result += "}, B={";
-                for (int vertex : set2)
-                {
-                    result += std::to_string(vertex) + ", ";
-                }
-                // Remove trailing comma and space from set B
-                if (!set2.empty())
-                    result.erase(result.length() - 2);
-
-                result += "}";
-                return result;
-            }
-            else
-            {
-                // Handle undirected graphs using the existing logic
-                // ... (rest of the code for bipartite detection in undirected graphs remains the same)
-            }
-        }
-    }
-  
-*/
 
 
     string Algorithms::isBipartite(ariel::Graph g) {
@@ -476,6 +380,10 @@ namespace ariel
     }  
     string Algorithms::negativeCycle(ariel::Graph g)
     {
+        if(g.getNumVertices() ==0 || g.getNumEdges() <1)
+        {
+            return "No negative cycle found";
+        }
         size_t V = (size_t)g.getNumVertices();                    // Get the number of vertices in the graph
         std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
         // Create a distance vector and initialize all distances as infinite
@@ -543,6 +451,10 @@ namespace ariel
 
     bool Algorithms::isDirected(Graph g)
     {
+        if(g.getNumVertices() ==0 || g.getNumEdges() <1)
+        {
+            return false;
+        }
         size_t V = (size_t)g.getNumVertices();                    // Get the number of vertices in the graph
         std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
         for (size_t i = 0; i < V; ++i)
