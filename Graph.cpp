@@ -61,4 +61,5 @@ namespace ariel
     {
         return this->numEdges;
     }
+    Graph::~Graph() { }
 }
