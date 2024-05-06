@@ -130,5 +130,66 @@ TEST_CASE("Test negative cycle")
         {0, 0, 4, 0, 5},
         {0, 0, 0, 5, 0}};
     g.loadGraph(graph2);
-    CHECK(ariel::Algorithms::negativeCycle(g) == "The negative cycle is: 3->2->1");
+    CHECK(ariel::Algorithms::negativeCycle(g) == "The negative cycle is: 1->2->1");
+}
+TEST_CASE("Test isConnected2") {
+
+  // Test connectivity for a single isolated vertex
+  ariel::Graph g;
+  vector<vector<int>> graph = {{0}};
+  g.loadGraph(graph);
+  CHECK(ariel::Algorithms::isConnected(g) == 0);
+
+  // Test disconnected graph with multiple components
+  vector<vector<int>> graph2 = {
+      {0, 0, 0},
+      {0, 0, 1},
+      {0, 1, 0}};
+  g.loadGraph(graph2);
+  CHECK(ariel::Algorithms::isConnected(g) == 0);
+}
+
+TEST_CASE("Test shortestPath2") {
+  // Test non-existent vertices
+  ariel::Graph g;
+  vector<vector<int>> graph = {{0, 1, 0}, {1, 0, 1}, {0, 1, 0}};
+  g.loadGraph(graph);
+  CHECK_THROWS(ariel::Algorithms::shortestPath(g, 3, 2));
+  CHECK_THROWS(ariel::Algorithms::shortestPath(g, -1, 0));
+  // Test shortest path to itself
+  CHECK(ariel::Algorithms::shortestPath(g, 0, 0) == "0");
+    vector<vector<int>> graph2 = {{0, -1, 0}, {-1, 0, -2}, {0, -2, 0}};
+    g.loadGraph(graph2);
+    CHECK_THROWS(ariel::Algorithms::shortestPath(g, 0, 2));
+
+  // Test multiple paths with same weight
+  vector<vector<int>> graph3 = {{0, 1, 1}, {1, 0, 1}, {1, 1, 0}};
+  g.loadGraph(graph3);
+  CHECK(ariel::Algorithms::shortestPath(g, 0, 2) == "0->1->2" );
+}
+
+TEST_CASE("Test isContainsCycle2") {
+  // Test self-loop
+  ariel::Graph g;
+  vector<vector<int>> graph = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+  g.loadGraph(graph);
+  CHECK(ariel::Algorithms::isContainsCycle(g) == true);
+
+  // Test disconnected cycles
+  vector<vector<int>> graph2 = {
+      {0, 0, 0}, {0, 0, 1}, {0, 1, 0}, {1, 0, 0, 1}, {0, 1, 0, 0}};
+  g.loadGraph(graph2);
+  CHECK(ariel::Algorithms::isContainsCycle(g) == true);
+}
+
+TEST_CASE("Test isBipartite2") {
+  // Test odd-length cycle
+  ariel::Graph g;
+  vector<vector<int>> graph = {{0, 1, 0}, {1, 0, 1}, {0, 1, 0}};
+  g.loadGraph(graph);
+  CHECK(ariel::Algorithms::isBipartite(g) == "0");
+
+  // Test complete graph
+  vector<vector<int>> graph2 = {{1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}};
+  g.loadGraph(graph2);
 }

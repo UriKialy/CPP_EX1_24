@@ -78,10 +78,9 @@ namespace ariel
         return false;
     }
 
-    
     int Algorithms::isConnected(ariel::Graph g)
     {
-        if (g.getNumVertices() <1)
+        if (g.getNumVertices() < 1 || g.getNumEdges() < 1)
         {
             return 0; // Empty graph is not connected
         }
@@ -143,7 +142,7 @@ namespace ariel
     }
     string Algorithms::shortestPath(ariel::Graph &g, int start, int end)
     {
-        if(g.getNumVertices() ==0 || g.getNumEdges() <1)
+        if (g.getNumVertices() == 0 || g.getNumEdges() < 1)
         {
             return "-1";
         }
@@ -210,248 +209,411 @@ namespace ariel
         return shortestPath;
     }
 
+    string Algorithms::isBipartite(ariel::Graph g)
+    {
+        if (g.getNumVertices() == 0)
+        {
+            return "The graph is bipartite: A={}, B={}"; // Empty graph is bipartite
+        }
+        else
+        {
+            size_t V = (size_t)g.getNumVertices();
 
-    string Algorithms::isBipartite(ariel::Graph g) {
-     if (g.getNumVertices() == 0) {
-     return "The graph is bipartite: A={}, B={}."; // Empty graph is bipartite
-   } else {
-     size_t V = (size_t)g.getNumVertices();
+            // Create a color vector to store colors assigned to vertices.
+            // 0 - Uncolored, 1 - Red, -1 - Blue
+            vector<int> color(V, 0);
 
-     // Create a color vector to store colors assigned to vertices.
-     // 0 - Uncolored, 1 - Red, -1 - Blue
-     vector<int> color(V, 0);
+            // Get the adjacency matrix of the graph
+            std::vector<std::vector<int>> G = g.getAdjacencyMatrix();
 
-     // Get the adjacency matrix of the graph
-     std::vector<std::vector<int>> G = g.getAdjacencyMatrix();
+            // BFS to check if any odd-length cycle exists (not bipartite)
+            for (size_t u = 0; u < V; ++u)
+            {
+                if (color[u] == 0)
+                {
+                    queue<size_t> q;
+                    color[u] = 1; // Assign starting color (Red)
+                    q.push(u);
+                    while (!q.empty())
+                    {
+                        size_t v = q.front();
+                        q.pop();
 
-     // BFS to check if any odd-length cycle exists (not bipartite)
-     for (size_t u = 0; u < V; ++u) {
-       if (color[u] == 0) {
-         queue<size_t> q;
-         color[u] = 1; // Assign starting color (Red)
-         q.push(u);
-         while (!q.empty()) {
-           size_t v = q.front();
-           q.pop();
+                        // Check for adjacent vertices
+                        for (size_t w = 0; w < V; ++w)
+                        {
+                            if (G[v][w] != 0)
+                            {
+                                if (color[w] == 0)
+                                {
+                                    color[w] = -color[v]; // Assign opposite color (Blue)
+                                    q.push(w);
+                                }
+                                else if (color[w] == color[v])
+                                {
+                                    // Adjacent vertices with same color (odd-length cycle)
+                                    return "0"; // Not bipartite
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
-           // Check for adjacent vertices
-           for (size_t w = 0; w < V; ++w) {
-             if (G[v][w] != 0) {
-               if (color[w] == 0) {
-                 color[w] = -color[v]; // Assign opposite color (Blue)
-                 q.push(w);
-               } else if (color[w] == color[v]) {
-                 // Adjacent vertices with same color (odd-length cycle)
-                 return "0"; // Not bipartite
-               }
-             }
-           }
-         }
-       }
-     }
+            // Separate vertices based on colors (assuming colors 1 and -1)
+            vector<int> group1, group2;
+            for (size_t i = 0; i < V; ++i)
+            {
+                if (color[i] == 1)
+                {
+                    group1.push_back(i);
+                }
+                else
+                {
+                    group2.push_back(i);
+                }
+            }
 
-     // Separate vertices based on colors (assuming colors 1 and -1)
-     vector<int> group1, group2;
-     for (size_t i = 0; i < V; ++i) {
-       if (color[i] == 1) {
-         group1.push_back(i);
-       } else {
-         group2.push_back(i);
-       }
-     }
+            // Construct the output string efficiently (avoid string concatenation)
+            std::stringstream result;
+            result << "The graph is bipartite: ";
 
-     // Construct the output string efficiently (avoid string concatenation)
-     std::stringstream result;
-     result << "The graph is bipartite: ";
+            if (!group1.empty())
+            {
+                result << "A={";
+                bool firstVertex1 = true;
+                for (int vertex : group1)
+                {
+                    if (firstVertex1)
+                    {
+                        result << vertex;
+                        firstVertex1 = false;
+                    }
+                    else
+                    {
+                        result << ", " << vertex;
+                    }
+                }
+                result << "}";
+            }
 
-     if (!group1.empty()) {
-       result << "A={";
-       bool firstVertex1 = true;
-       for (int vertex : group1) {
-         if (firstVertex1) {
-           result << vertex;
-           firstVertex1 = false;
-         } else {
-           result << ", " << vertex;
-         }
-       }
-       result << "}";
-     }
+            if (!group2.empty())
+            {
+                if (!group1.empty())
+                {
+                    result << ", "; // Add comma only if both groups have elements
+                }
+                result << "B={";
+                bool firstVertex2 = true;
+                for (int vertex : group2)
+                {
+                    if (firstVertex2)
+                    {
+                        result << vertex;
+                        firstVertex2 = false;
+                    }
+                    else
+                    {
+                        result << ", " << vertex;
+                    }
+                }
+                result << "}";
+            }
 
-     if (!group2.empty()) {
-       if (!group1.empty()) {
-         result << ", "; // Add comma only if both groups have elements
-       }
-       result << "B={";
-       bool firstVertex2 = true;
-       for (int vertex : group2) {
-         if (firstVertex2) {
-           result << vertex;
-           firstVertex2 = false;
-         } else {
-           result << ", " << vertex;
-         }
-       }
-       result << "}";
-     }
+            return result.str();
+        }
 
-     return result.str();
-   }
- 
+        {
+            if (g.getNumVertices() == 0)
+            {
+                return "The graph is bipartite: A={}, B={}.";
+            }
+            else
+            {
+                size_t V = (size_t)g.getNumVertices();
+                // Create a color vector to store colors assigned to vertices.
+                // 0 - Uncolored, 1 - Red, -1 - Blue
+                vector<int> color(V, 0);
+                std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
+                // BFS to check if any odd-length cycle exists (not bipartite)
+                for (size_t u = 0; u < V; ++u)
+                {
+                    if (color[u] == 0)
+                    {
+                        queue<size_t> q;
+                        color[u] = 1; // Assign starting color (Red)
+                        q.push(u);
+                        while (!q.empty())
+                        {
+                            size_t v = q.front();
+                            q.pop();
 
+                            // Check for adjacent vertices
+                            for (size_t w = 0; w < V; ++w)
+                            {
+                                if (G[v][w] != 0)
+                                {
+                                    if (color[w] == 0)
+                                    {
+                                        color[w] = -color[v]; // Assign opposite color (Blue)
+                                        q.push(w);
+                                    }
+                                    else if (color[w] == color[v])
+                                    {
+                                        // Adjacent vertices with same color (odd-length cycle)
+                                        return "0"; // Not bipartite
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                // Separate vertices based on colors (assuming colors 1 and -1)
+                vector<int> group1, group2;
+                for (size_t i = 0; i < V; ++i)
+                {
+                    if (color[i] == 1)
+                    {
+                        group1.push_back(i);
+                    }
+                    else
+                    {
+                        group2.push_back(i);
+                    }
+                }
+                std::string result = "The graph is bipartite: A={";
+                for (int vertex : group1)
+                {
+                    result += std::to_string(vertex) + ", ";
+                }
+                // Remove trailing comma and space from group A
+                result.erase(result.length() - 2, 2);
+
+                result += "}, B={";
+                for (int vertex : group2)
+                {
+                    result += std::to_string(vertex) + ", ";
+                }
+                // Remove trailing comma and space from group B
+                result.erase(result.length() - 2, 2);
+
+                result += "}";
+                return result;
+            }
+        }
+    }
+
+    /* string Algorithms::negativeCycle(ariel::Graph g)
      {
-         if (g.getNumVertices() == 0)
+         if (g.getNumVertices() == 0 || g.getNumEdges() < 1)
          {
-             return "The graph is bipartite: A={}, B={}.";
+             return "No negative cycle found";
          }
-         else
+         // Add a new vertex with outgoing edges to all existing vertices
+         size_t n = (size_t)g.getNumVertices();
+         std::vector<std::vector<int>> new_adjacency_matrix(n + 1, std::vector<int>(n + 1, 0));
+         for (size_t i = 0; i < n; ++i)
          {
-             size_t V = (size_t)g.getNumVertices();
-             // Create a color vector to store colors assigned to vertices.
-             // 0 - Uncolored, 1 - Red, -1 - Blue
-             vector<int> color(V, 0);
-             std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
-             // BFS to check if any odd-length cycle exists (not bipartite)
-             for (size_t u = 0; u < V; ++u)
+             for (size_t j = 0; j < n; ++j)
              {
-                 if (color[u] == 0)
-                 {
-                     queue<size_t> q;
-                     color[u] = 1; // Assign starting color (Red)
-                     q.push(u);
-                     while (!q.empty())
-                     {
-                         size_t v = q.front();
-                         q.pop();
+                 new_adjacency_matrix[i + 1][j + 1] = g.getAdjacencyMatrix()[i][j];
+             }
+             new_adjacency_matrix[0][i + 1] = 0; // Add an outgoing edge from the new vertex to all existing vertices
+         }
 
-                         // Check for adjacent vertices
-                         for (size_t w = 0; w < V; ++w)
-                         {
-                             if (G[v][w] != 0)
-                             {
-                                 if (color[w] == 0)
-                                 {
-                                     color[w] = -color[v]; // Assign opposite color (Blue)
-                                     q.push(w);
-                                 }
-                                 else if (color[w] == color[v])
-                                 {
-                                     // Adjacent vertices with same color (odd-length cycle)
-                                     return "0"; // Not bipartite
-                                 }
-                             }
-                         }
+         // Run Bellman-Ford with cycle detection
+         std::vector<int> distance(n + 1, INT_MAX);
+         distance[0] = 0;
+         std::vector<int> predecessor(n + 1, -1);
+
+         for (size_t i = 0; i < n; ++i)
+         {
+             for (size_t u = 0; u < n + 1; ++u)
+             {
+                 for (size_t v = 0; v < n + 1; ++v)
+                 {
+                     if (new_adjacency_matrix[u][v] > 0 && distance[u] + new_adjacency_matrix[u][v] < distance[v])
+                     {
+                         distance[v] = distance[u] + new_adjacency_matrix[u][v];
+                         predecessor[v] = u;
                      }
                  }
              }
-             // Separate vertices based on colors (assuming colors 1 and -1)
-             vector<int> group1, group2;
-             for (size_t i = 0; i < V; ++i)
-             {
-                 if (color[i] == 1)
-                 {
-                     group1.push_back(i);
-                 }
-                 else
-                 {
-                     group2.push_back(i);
-                 }
-             }
-             std::string result = "The graph is bipartite: A={";
-             for (int vertex : group1)
-             {
-                 result += std::to_string(vertex) + ", ";
-             }
-             // Remove trailing comma and space from group A
-             result.erase(result.length() - 2, 2);
-
-             result += "}, B={";
-             for (int vertex : group2)
-             {
-                 result += std::to_string(vertex) + ", ";
-             }
-             // Remove trailing comma and space from group B
-             result.erase(result.length() - 2, 2);
-
-             result += "}";
-             return result;
          }
-     }
-    }  
-    string Algorithms::negativeCycle(ariel::Graph g)
+
+         // Check for negative cycle in the last iteration
+         for (size_t u = 0; u < n + 1; ++u)
+         {
+             for (size_t v = 0; v < n + 1; ++v)
+             {
+                 if (new_adjacency_matrix[u][v] > 0 && distance[u] + new_adjacency_matrix[u][v] < distance[v])
+                 {
+                     // Negative cycle detected
+
+                     // Trace the cycle using predecessor pointers
+                     std::string cycle;
+                     size_t v_current = v;
+                     while (predecessor[v_current] != -1 && cycle.find(std::to_string(v_current)) == std::string::npos)
+                     {
+                         cycle += std::to_string(v_current) + " -> ";
+                         v_current = (size_t)predecessor[v_current];
+                     }
+                     cycle += std::to_string(v_current);
+                     return "Negative cycle: " + cycle;
+                 }
+             }
+         }
+
+         return "No negative cycle found"; // No negative cycle found
+     }*/
+    //  second version of negative cycle
+    string Algorithms::negativeCycle(ariel::Graph graph)
     {
-        if(g.getNumVertices() ==0 || g.getNumEdges() <1)
+        if (graph.getNumVertices() == 0 || graph.getNumEdges() < 1)
         {
             return "No negative cycle found";
         }
-        size_t V = (size_t)g.getNumVertices();                    // Get the number of vertices in the graph
-        std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
-        // Create a distance vector and initialize all distances as infinite
-        vector<int> dist(V, numeric_limits<int>::max());
-        // Create a predecessor vector to store the previous node in the shortest path
-        vector<int> prev(V, -1);
-        // Relax all edges V-1 times.
-        for (size_t i = 0; i < V - 1; ++i)
+        size_t n = (size_t)graph.getNumVertices();
+        vector<int> distance(n, INT_MAX);
+        vector<int> predecessor(n, -1);
+        int cycle_start = -1;
+        distance.resize(n);
+        // Assume the source vertex is 0
+        distance[0] = 0;
+        std::vector<std::vector<int>> G = graph.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
+        for (size_t i = 0; i < n; ++i)
         {
-            for (size_t u = 0; u < V; ++u)
+            cycle_start = -1;
+            for (size_t u = 0; u < n; ++u)
             {
-                for (size_t v = 0; v < V; ++v)
+                for (size_t v = 0; v < n; ++v)
                 {
-                    // Check if the edge (u, v) exists and if relaxing it improves the distance
-                    if (G[u][v] != 0 && dist[u] + G[u][v] < dist[v])
+                    if (G[u][v] != 0)
                     {
-                        dist[v] = dist[u] + G[u][v];
-                        prev[v] = u;
-                    }
-                }
-            }
-        }
-        // Check for negative-weight cycles. If there is a cycle, a shorter path
-        // will be found even after V-1 relaxations.
-        for (size_t u = 0; u < V; ++u)
-        {
-            for (size_t v = 0; v < V; ++v)
-            {
-                if (G[u][v] != 0 && dist[u] + G[u][v] < dist[v])
-                {
-                    // Negative cycle detected
-                    // Use a stack to track the cycle
-                    stack<int> cycle;
-                    size_t current = (size_t)v;
-                    // Find the starting vertex of the cycle (loop)
-                    do
-                    {
-                        cycle.push(current);
-                        current = (size_t)prev[current];
-                    } while (current != -1 && current != cycle.top());
-
-                    // Build the cycle string if a loop is found (not used here)
-                    if (!cycle.empty())
-                    {
-                        string negativeCycleString;
-                        negativeCycleString += to_string(cycle.top());
-                        cycle.pop();
-
-                        while (!cycle.empty())
+                        int new_distance = distance[u] + G[u][v];
+                        if (new_distance < distance[v])
                         {
-                            negativeCycleString += " -> " + to_string(cycle.top());
-                            cycle.pop();
+                            distance[v] = new_distance;
+                            predecessor[v] = (int)u;
+                            cycle_start = v;
                         }
-
-                        negativeCycleString += " -> " + to_string(cycle.top());
-
-                        return "Negative cycle found: " + negativeCycleString;
                     }
                 }
             }
         }
-        // No negative cycle found
-        return "No negative cycle found";
+
+        vector<int> cycle;
+        if (cycle_start != -1)
+        {
+            // We found a negative cycle
+            // Go n steps back to make sure we are in the cycle
+            size_t v = (size_t)cycle_start;
+            for (size_t i = 0; i < n; ++i)
+            {
+                v = (size_t)predecessor[(size_t)v];
+            }
+
+            // Add vertices to the cycle
+            for (int u = v;; u = predecessor[(size_t)u])
+            {
+                cycle.push_back(u);
+                if (u == v && cycle.size() > 1)
+                {
+                    break;
+                }
+            }
+            reverse(cycle.begin(), cycle.end());
+
+            // Convert cycle to a string representation
+            string cycle_str;
+            for (size_t i = 0; i < cycle.size(); ++i)
+            {
+                cycle_str += to_string(cycle[i]);
+                if (i != cycle.size() - 1)
+                {
+                    cycle_str += "->";
+                }
+            }
+            return "The negative cycle is: " + cycle_str;
+        }
+
+        return "No negative cycle found"; // No negative cycle found
     }
+
+    /* string Algorithms::negativeCycle(ariel::Graph g)
+     {
+         if(g.getNumVertices() ==0 || g.getNumEdges() <1)
+         {
+             return "No negative cycle found";
+         }
+         size_t V = (size_t)g.getNumVertices();                    // Get the number of vertices in the graph
+         std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
+         // Create a distance vector and initialize all distances as infinite
+         vector<int> dist(V, numeric_limits<int>::max());
+         // Create a predecessor vector to store the previous node in the shortest path
+         vector<int> prev(V, -1);
+         // Relax all edges V-1 times.
+         for (size_t i = 0; i < V - 1; ++i)
+         {
+             for (size_t u = 0; u < V; ++u)
+             {
+                 for (size_t v = 0; v < V; ++v)
+                 {
+                     // Check if the edge (u, v) exists and if relaxing it improves the distance
+                     if (G[u][v] != 0 && dist[u] + G[u][v] < dist[v])
+                     {
+                         dist[v] = dist[u] + G[u][v];
+                         prev[v] = u;
+                     }
+                 }
+             }
+         }
+         // Check for negative-weight cycles. If there is a cycle, a shorter path
+         // will be found even after V-1 relaxations.
+         for (size_t u = 0; u < V; ++u)
+         {
+             for (size_t v = 0; v < V; ++v)
+             {
+                 if (G[u][v] != 0 && dist[u] + G[u][v] < dist[v])
+                 {
+                     // Negative cycle detected
+                     // Use a stack to track the cycle
+                     stack<int> cycle;
+                     size_t current = (size_t)v;
+                     // Find the starting vertex of the cycle (loop)
+                     do
+                     {
+                         cycle.push(current);
+                         current = (size_t)prev[current];
+                     } while (current != -1 && current != cycle.top());
+
+                     // Build the cycle string if a loop is found (not used here)
+                     if (!cycle.empty())
+                     {
+                         string negativeCycleString;
+                         negativeCycleString += to_string(cycle.top());
+                         cycle.pop();
+
+                         while (!cycle.empty())
+                         {
+                             negativeCycleString += " -> " + to_string(cycle.top());
+                             cycle.pop();
+                         }
+
+                         negativeCycleString += " -> " + to_string(cycle.top());
+
+                         return "Negative cycle found: " + negativeCycleString;
+                     }
+                 }
+             }
+         }
+         // No negative cycle found
+         return "No negative cycle found";
+     }*/
 
     bool Algorithms::isDirected(Graph g)
     {
-        if(g.getNumVertices() ==0 || g.getNumEdges() <1)
+        if (g.getNumVertices() == 0 || g.getNumEdges() < 1)
         {
             return false;
         }

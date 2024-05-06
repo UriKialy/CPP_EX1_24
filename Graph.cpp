@@ -14,6 +14,14 @@ namespace ariel
     }
     void Graph::loadGraph(vector<vector<int>> g)
     {
+        if (g.empty())
+        {
+            numVertices = 0;
+            numEdges = 0;
+            adjacencyMatrix = {}; // Already empty vector
+            return;
+        }
+
         // Check if the graph is a square matrix.
         if (g.size() == g[0].size())
         {
@@ -23,19 +31,19 @@ namespace ariel
         {
             throw invalid_argument("The graph is not a square matrix");
         }
-        adjacencyMatrix = g;// Load the mstrix to the graph 
+        adjacencyMatrix = g; // Load the mstrix to the graph
         int numofedges = 0;
         for (size_t i = 0; i < numVertices; i++)
         {
             for (size_t j = 0; j < numVertices; j++)
             {
-                if (adjacencyMatrix[i][j] != 0 && adjacencyMatrix[j][i]!=0) 
+                if (adjacencyMatrix[i][j] != 0 && adjacencyMatrix[j][i] != 0)
                 {
                     numofedges++;
                 }
             }
         }
-        numEdges = (int )numofedges/2;
+        numEdges = (int)numofedges / 2;
     }
     std::vector<std::vector<int>> Graph::getAdjacencyMatrix()
     {
