@@ -13,6 +13,7 @@ namespace ariel
         int numEdges;
     public:
         Graph();
+        ~Graph() {  }
 
         //this function will load the graph to the object
         void loadGraph(vector<vector<int>> g);

@@ -193,3 +193,88 @@ TEST_CASE("Test isBipartite2") {
   vector<vector<int>> graph2 = {{1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}};
   g.loadGraph(graph2);
 }
+
+TEST_CASE("Test shortestPath with Multiple Shortest Paths") {
+    ariel::Graph g;
+    vector<vector<int>> graph = {
+        {0, 1, 1},
+        {1, 0, 1},
+        {1, 1, 0}};
+    g.loadGraph(graph);
+    if((ariel::Algorithms::shortestPath(g, 0, 2) == "0->1->2") || (ariel::Algorithms::shortestPath(g, 0, 2) == "0->2")){
+        }
+        else{
+            CHECK(false);
+        
+    }
+}
+TEST_CASE("Test isBipartite with Single Vertex Graph") {
+    ariel::Graph g;
+    vector<vector<int>> graph = {{0}};
+    g.loadGraph(graph);
+    CHECK(ariel::Algorithms::isBipartite(g) == "The graph is bipartite: A={0}, B={}");
+}
+TEST_CASE("Test isBipartite with Non-Bipartite Graph 2") {
+    ariel::Graph g;
+    vector<vector<int>> graph = {
+        {0, 1, 0, 0},
+        {1, 0, 1, 1},
+        {0, 1, 0, 1},
+        {0, 1, 1, 0}};
+    g.loadGraph(graph);
+    CHECK(ariel::Algorithms::isBipartite(g) == "");
+}
+TEST_CASE("Test shortestPath with Vertex Outside of Range") {
+    ariel::Graph g;
+    vector<vector<int>> graph = {
+        {0, 1, 1},
+        {1, 0, 1},
+        {1, 1, 0}};
+    g.loadGraph(graph);
+    CHECK_THROWS(ariel::Algorithms::shortestPath(g, 0, 5));
+}
+TEST_CASE("Test negativeCycle with Multiple Negative Cycles") {
+    ariel::Graph g;
+    vector<vector<int>> graph = {
+        {0, 1, 2},
+        {1, 0, -6},
+        {2, -6, 0}};
+    g.loadGraph(graph);
+    string result = ariel::Algorithms::negativeCycle(g);
+    if(result == "The negative cycle is: 1->2->1"|| result == "The negative cycle is: 2->1->2"){
+    }
+    else{
+        CHECK(false);
+    }
+}
+TEST_CASE("Test shortestPath with Self-Loop") {
+    ariel::Graph g;
+    vector<vector<int>> graph = {
+        {1, 0, 0},
+        {0, 1, 0},
+        {0, 0, 1}};
+    g.loadGraph(graph);
+    CHECK(ariel::Algorithms::shortestPath(g, 0, 0) == "0");
+}
+TEST_CASE("Test isContainsCycle with Disconnected Cycles") {
+    ariel::Graph g;
+    vector<vector<int>> graph = {
+        {0, 1, 0, 0, 0},
+        {1, 0, 0, 0, 0},
+        {0, 0, 0, 1, 0},
+        {0, 0, 1, 0, 0},
+        {0, 0, 0, 0, 0}};
+    g.loadGraph(graph);
+    CHECK(ariel::Algorithms::isContainsCycle(g) == true);
+}
+TEST_CASE("Test negativeCycle with No Negative Cycle") {
+    ariel::Graph g;
+    vector<vector<int>> graph = {
+        {0, 1, 2},
+        {1, 0, 3},
+        {2, 3, 0}};
+    g.loadGraph(graph);
+    CHECK(ariel::Algorithms::negativeCycle(g) == "No negative cycle found");
+}
+
+
