@@ -30,9 +30,7 @@ namespace ariel{
     static bool DFSUtil(ariel::Graph graph, size_t v, std::vector<bool>& visited); 
     
     // DFS function using recursion and tracking parent for cycle detection
-    static bool dfsForCycle(std::vector<std::vector<size_t>>& G, std::vector<bool>& visited, std::vector<int>& parent, size_t curr);
-   
-    static bool isDirected(Graph g); 
+    static bool dfsForCycle(std::vector<std::vector<size_t>>& G, std::vector<bool>& visited, std::vector<int>& parent, size_t curr); 
 };
 }
 #endif

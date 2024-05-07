@@ -11,6 +11,7 @@ namespace ariel
         vector<vector<int>> adjacencyMatrix;
         int numVertices;
         int numEdges;
+        bool isdirected;
     public:
         Graph();
         ~Graph() {  }
@@ -29,6 +30,12 @@ namespace ariel
 
         //this function will return the number of edges in the graph
         int getNumEdges();
+
+        //this function will return true if the graph is directed and false if it is not
+        bool isDirected();
+
+        //this func will return the reverse graph
+        Graph getTranspose();
     };
 }
 #endif
