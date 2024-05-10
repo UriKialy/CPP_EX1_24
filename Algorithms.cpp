@@ -176,7 +176,7 @@ namespace ariel
         }
         return true; // All reachable nodes have been visited
     }
-    string Algorithms::shortestPath(ariel::Graph &g, int start, int end)
+  string Algorithms::shortestPath(ariel::Graph &g, int start, int end)
     {
         if (g.getNumVertices() == 0 || g.getNumEdges() < 1 || start < 0 || end < 0 || start >= g.getNumVertices() || end >= g.getNumVertices())
         {
@@ -184,7 +184,7 @@ namespace ariel
         }
         if (negativeCycle(g) != "No negative cycle found")
         {
-            throw runtime_error("Graph contains a negative-weight cycle!");
+            return negativeCycle(g);
         }
         if (start == end)
         {
@@ -240,6 +240,7 @@ namespace ariel
         return shortestPath;
     }
 
+
     string Algorithms::isBipartite(ariel::Graph &g)
     {
         if (g.getNumVertices() == 0)
@@ -262,13 +263,13 @@ namespace ariel
             {
                 if (color[u] == 0)
                 {
-                    queue<size_t> q;
+                    queue<size_t> queue;
                     color[u] = 1; // Assign starting color (Red)
-                    q.push(u);
-                    while (!q.empty())
+                    queue.push(u);
+                    while (!queue.empty())
                     {
-                        size_t v = q.front();
-                        q.pop();
+                        size_t v = queue.front();
+                        queue.pop();
 
                         // Check for adjacent vertices
                         for (size_t w = 0; w < V; ++w)
@@ -278,7 +279,7 @@ namespace ariel
                                 if (color[w] == 0)
                                 {
                                     color[w] = -color[v]; // Assign opposite color (Blue)
-                                    q.push(w);
+                                    queue.push(w);
                                 }
                                 else if (color[w] == color[v])
                                 {
@@ -349,75 +350,369 @@ namespace ariel
             return result.str();
         }
     }
-    string Algorithms::negativeCycle(ariel::Graph &graph)
-    {
-        if (graph.getNumVertices() == 0 || graph.getNumEdges() < 1)
+
+string Algorithms::negativeCycle( Graph& graph) {
+        if (graph.getNumVertices() < 2 || graph.getNumEdges() < 2)
         {
-            return "No negative cycle found";
+            return "No negative cycle found"; // Return "0" if the graph is empty or has les than 2 edge\vertex
         }
-
-        size_t vertixNumber = (size_t)graph.getNumVertices();
-        vector<int> distance(vertixNumber, INT_MAX);
-        vector<int> predecessor(vertixNumber, -1);
-        int cycle_start = -1;
-        distance[0] = 0;
-        vector<vector<int>> GraphMat = graph.getAdjacencyMatrix();
-
-        // Run Bellman-Ford algorithm
-        for (size_t i = 0; i < vertixNumber; ++i)
-        {
-            for (size_t u = 0; u < vertixNumber; ++u)
-            {
-                for (size_t v = 0; v < vertixNumber; ++v)
-                {
-                    if (GraphMat[u][v] != 0)
-                    {
-                        int new_distance = distance[u] + GraphMat[u][v];
-                        if (new_distance < distance[v])
-                        {
-                            distance[v] = new_distance;
-                            predecessor[v] = (int)u;
-                            if (i == vertixNumber - 1)
-                                cycle_start = v; // Found a negative cycle
-                        }
-                    }
-                }
-            }
+    vector<vector<int>> GraphMat = graph.getAdjacencyMatrix();
+    //small check if the graph deosnt have negative edges
+    bool isnegativeEdges=true;
+    for(size_t i=0;i< GraphMat.size();i++){
+        if(GraphMat[i][i]<0){
+            isnegativeEdges=false;
+            break;
         }
-        vector<int> cycle;
-        if (cycle_start != -1)
-        {
-            size_t v = (size_t)cycle_start;
-            for (size_t i = 0; i < vertixNumber; ++i)
-            {
-                v = (size_t)predecessor[(size_t)v];
-            }
-
-            for (int u = v;; u = predecessor[(size_t)u])
-            {
-                cycle.push_back(u);
-                if (u == v && cycle.size() > 1)
-                {
-                    break;
-                }
-            }
-            reverse(cycle.begin(), cycle.end());
-
-            string cycle_str;
-            for (size_t i = 0; i < cycle.size(); ++i)
-            {
-                cycle_str += to_string(cycle[i]);
-                if (i != cycle.size() - 1)
-                {
-                    cycle_str += "->";
-                }
-            }
-            if(cycle_str.size()>1)
-            return "The negative cycle is: " + cycle_str;
-        }
-
+    }
+    if(isnegativeEdges){
         return "No negative cycle found";
     }
+/* size_t numVertices =(size_t) graph.getNumVertices();
+
+  // Initialize distance and predecessor arrays
+  std::vector<int> d(numVertices, std::numeric_limits<int>::max());
+  std::vector<int> pi(numVertices, -1);  // -1 represents no predecessor
+
+  // Loop through all vertices (no need for SCCs in this case)
+  for (size_t v = 0; v < numVertices; ++v) {
+    // Relaxation step (|V| - 1) times
+    for (size_t i = 0; i < numVertices - 1; ++i) {
+      for (size_t u = 0; u < numVertices; ++u) {
+        for (size_t neighbor=0;neighbor< GraphMat[u]) {
+          int weight = GraphMat[u][neighbor];  
+          if (d[u] + weight < d[neighbor]) {
+            d[neighbor] = d[u] + weight;
+            pi[neighbor] = u;
+          }
+        }
+      }
+    }
+  }
+
+  // Check for negative cycle (relaxation one more time)
+  for (size_t u = 0; u < numVertices; ++u) {
+    for (size_t  neighbor : GraphMat[u]) {
+      int weight = GraphMat[u][neighbor];
+      if (d[u] + weight < d[neighbor]) {
+        // Negative cycle detected, find the cycle
+        std::vector<int> cycle;
+        int v = neighbor;
+        cycle.push_back(v);
+        while (pi[v] != -1 && pi[v] != cycle[0]) {
+          v = pi[v];
+          cycle.push_back(v);
+        }
+        if (pi[v] != -1) {  // Cycle found
+          cycle.push_back(v);
+          std::stringstream ss;
+          ss << "Negative cycle found: ";
+          for (int node : cycle) {
+            ss << node << " ";
+          }
+          return ss.str();
+        }
+      }
+    }
+  }
+
+  // No negative cycle found
+  return "No negative cycles found";
+}*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // Add a new vertex with outgoing edges to all existing vertices
+  size_t vertixNum = (size_t)graph.getNumVertices();
+  std::vector<std::vector<int>> new_adjacency_matrix(vertixNum + 1, std::vector<int>(vertixNum+ 1, 0));
+  for (size_t i = 0; i < vertixNum; ++i) {
+    for (size_t j = 0; j < vertixNum; ++j) {
+      new_adjacency_matrix[i + 1][j + 1] = graph.getAdjacencyMatrix()[i][j];
+    }
+    new_adjacency_matrix[0][i + 1] = 0; // Add an outgoing edge from the new vertex to all existing vertices
+  }
+
+  // Run Bellman-Ford with cycle detection
+  std::vector<int> distance(vertixNum + 1, INT_MAX);
+  for(size_t i=0;i<distance.size();i++){
+      distance[i]=0;
+  
+  std::vector<int> predecessor(vertixNum + 1, -1);
+
+  for (size_t i = 0; i < vertixNum; ++i) {
+    for (size_t u = 0; u <  + 1; ++u) {
+      for (size_t v = 0; v < vertixNum + 1; ++v) {
+        if (new_adjacency_matrix[u][v] > 0 && distance[u] + new_adjacency_matrix[u][v] < distance[v]) {
+          distance[v] = distance[u] + new_adjacency_matrix[u][v];
+          predecessor[v] = u;
+        }
+      }
+    }
+  }
+
+  // Check for negative cycle in the last iteration
+  for (size_t u = 0; u < vertixNum + 1; ++u)
+  {
+      for (size_t v = 0; v < vertixNum + 1; ++v)
+      {
+          if (new_adjacency_matrix[u][v] > 0 && distance[u] + new_adjacency_matrix[u][v] < distance[v])
+          {
+              // Negative cycle detected
+
+              // Trace the cycle using predecessor pointers
+              std::string cycleString;
+              int v_current = v;
+              while (predecessor[(size_t)v_current] != -1 && cycleString.find(std::to_string(v_current)) == std::string::npos)
+              {
+                  cycleString += std::to_string(v_current) + " -> ";
+                  v_current = predecessor[(size_t)v_current];
+              }
+              cycleString += std::to_string(v_current);
+              if (cycleString.size() > 3)
+              {
+                  return "Negative cycle: " + cycleString;
+              }
+          }
+      }
+  }
+  }
+  return "No negative cycle found3"; // No negative cycle found
+}
+
+//     string Algorithms::negativeCycle(Graph& graph) {
+//         if (graph.getNumVertices() < 2 || graph.getNumEdges() < 2)
+//         {
+//             return "No negative cycle found"; // Return "0" if the graph is empty or has les than 2 edge\vertex
+//         }
+//     vector<vector<int>> GraphMat = graph.getAdjacencyMatrix();
+//     //small check if the graph deosnt have negative edges
+//     bool isPositiveEdge=true;
+//     for(size_t i=0;i< GraphMat.size();i++){
+//         if(GraphMat[i][i]<0){
+//             isPositiveEdge=false;
+//             break;
+//         }
+//     }
+//     if(isPositiveEdge){
+//         return "No negative cycle found";
+//     }
+//     size_t vertixNum =(size_t) graph.getNumVertices();
+//     vector<int> distance(vertixNum, INT_MAX);
+//     vector<int> predecessor(vertixNum, -1);
+//     int cycle_start = -1;
+//     distance[0] = 0;
+//     for (size_t i = 0; i < vertixNum; ++i)
+//     {
+//         cycle_start = -1;
+//         for (size_t u = 0; u < vertixNum; ++u)
+//         {
+//             for (size_t v = 0; v < vertixNum; ++v)
+//             {
+//                 if (GraphMat[u][v] != 0)
+//                 {
+//                     // relax the edge
+//                     int new_distance = distance[u] + GraphMat[u][v];
+//                     if (new_distance < distance[v])
+//                     {
+//                         distance[v] = new_distance;
+//                         predecessor[v] = (int)u;
+//                         cycle_start = v;
+//                     }
+//                 }
+//             }
+//         }
+//     }
+    
+//     vector<int> cycle;
+//     if (cycle_start != -1)
+//     {
+//         // We found a negative cycle
+//         int vertex = cycle_start;
+//         for (size_t i = 0; i < vertixNum; ++i)
+//         {
+//             vertex = predecessor[(size_t)vertex];
+//         }
+//         // Add vertices to the cycle
+//         for (int u = vertex;; u = predecessor[(size_t)u])
+//         {
+//             cycle.push_back(u);
+//             if (u == vertex && cycle.size() > 1)
+//             {
+//                 break;
+//             }
+//         }
+//         reverse(cycle.begin(), cycle.end());
+//     }
+
+//     if(cycle.size()>3){
+//                 // Construct the cycle string
+//                 string cycleStr = "Negative Cycle: ";
+//                 for (size_t i = 0; i < cycle.size(); ++i) 
+//                 {
+//                     cycleStr += to_string(cycle[i]);
+//                     if (i < cycle.size() - 1) cycleStr += " -> ";
+//                 }
+//                 // Return the cycle string
+//                 return cycleStr;
+//             }
+//     return "No negative cycle found";
+// }
+
+
+
+
+/*
+string Algorithms::negativeCycle(Graph& graph) 
+{
+    if (graph.getNumVertices() < 2 || graph.getNumEdges() < 2)
+        {
+            return "No negative cycle found"; // Return "0" if the graph is empty or has les than 2 edge\vertex
+        }
+    vector<vector<int>> GraphMat = graph.getAdjacencyMatrix();
+    size_t V = (size_t)GraphMat.size();
+    vector<size_t> dist(V, 0);
+    vector<int> parent(V, -1);
+    // Relax all edges V-1 times
+    for (size_t i = 0; i < V - 1; ++i) 
+    {
+        for (size_t u = 0; u < V; ++u) 
+        {
+            for (size_t v = 0; v < V; ++v) 
+            {
+                if (GraphMat[u][v] != 0 && dist[u] + (size_t)GraphMat[u][v] < dist[v]) 
+                {
+                    dist[v] = dist[u] + (size_t)GraphMat[u][v];
+                    parent[v] = u;
+                }
+            }
+        }
+    }
+
+    // Step 2: Check for negative cycle
+    vector<int> cycle;
+    for (size_t u = 0; u < V; ++u) 
+    {
+        for (size_t v = 0; v < V; ++v) 
+        {
+            if (GraphMat[u][v] != 0 && dist[u] + (size_t)GraphMat[u][v] < dist[v]) 
+            {
+                // Negative cycle found, trace back to find the cycle
+                int current = v;
+                do {
+                    cycle.push_back(current);
+                    current = parent[size_t(current)];
+                } while (current != v);
+
+                // Add the starting vertex of the cycle
+                cycle.push_back(v);
+                // Reverse the cycle to get the correct order
+                reverse(cycle.begin(), cycle.end());
+                if(cycle.size()>3){
+                // Construct the cycle string
+                string cycleStr = "Negative Cycle: ";
+                for (size_t i = 0; i < cycle.size(); ++i) 
+                {
+                    cycleStr += to_string(cycle[i]);
+                    if (i < cycle.size() - 1) cycleStr += " -> ";
+                }
+
+                // Return the cycle string
+                return cycleStr;
+            }
+            }
+        }
+    }
+
+    // No negative cycle found
+    return "No negative cycle found";
+}
+
+*/
+
+
+
+    // string Algorithms::negativeCycle(ariel::Graph &graph)
+    // {
+    //     if (graph.getNumVertices() == 0 || graph.getNumEdges() < 1)
+    //     {
+    //         return "No negative cycle found";
+    //     }
+
+    //     size_t vertixNumber = (size_t)graph.getNumVertices();
+    //     vector<int> distance(vertixNumber, INT_MAX);
+    //     vector<int> predecessor(vertixNumber, -1);
+    //     int cycle_start = -1;
+    //     distance[0] = 0;
+    //     vector<vector<int>> GraphMat = graph.getAdjacencyMatrix();
+
+    //     // Run Bellman-Ford algorithm
+    //     for (size_t i = 0; i < vertixNumber; ++i)
+    //     {
+    //         for (size_t u = 0; u < vertixNumber; ++u)
+    //         {
+    //             for (size_t v = 0; v < vertixNumber; ++v)
+    //             {
+    //                 if (GraphMat[u][v] != 0)
+    //                 {
+    //                     int new_distance = distance[u] + GraphMat[u][v];
+    //                     if (new_distance < distance[v])
+    //                     {
+    //                         distance[v] = new_distance;
+    //                         predecessor[v] = (int)u;
+    //                         if (i == vertixNumber - 1)
+    //                             cycle_start = v; // Found a negative cycle
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     vector<int> cycle;
+    //     if (cycle_start != -1)
+    //     {
+    //         size_t v = (size_t)cycle_start;
+    //         for (size_t i = 0; i < vertixNumber; ++i)
+    //         {
+    //             v = (size_t)predecessor[(size_t)v];
+    //         }
+
+    //         for (int u = v;; u = predecessor[(size_t)u])
+    //         {
+    //             cycle.push_back(u);
+    //             if (u == v && cycle.size() > 1)
+    //             {
+    //                 break;
+    //             }
+    //         }
+    //         reverse(cycle.begin(), cycle.end());
+    //         if(cycle.size()>3){  
+    //         string cycle_str;
+    //         for (size_t i = 0; i < cycle.size(); ++i)
+    //         {
+    //             cycle_str += to_string(cycle[i]);
+    //             if (i != cycle.size() - 1)
+    //             {
+    //                 cycle_str += "->";
+    //             }
+    //         }
+    //         return "The negative cycle is: " + cycle_str;
+    //     }
+    //     }
+
+    //     return "No negative cycle found";
+    // }
 
     // string Algorithms::negativeCycle(ariel::Graph graph)
     // {
