@@ -66,17 +66,6 @@ namespace ariel
     void Graph::printGraph()
     {
         cout << "Graph with " << numVertices << " vertices and " << numEdges << " edges." << endl;
-        // cout<<"the edges are:"<<endl;
-        // for (size_t i = 0; i < numVertices; i++)
-        // {
-        //     for (size_t j = 0; j < numVertices; j++)
-        //     {
-        //         if (adjacencyMatrix[i][j] != 0)
-        //         {
-        //             cout << i << " -> " << j << endl;
-        //         }
-        //     }
-        // }
     }
     int Graph::getNumVertices()
     {
