@@ -3,6 +3,7 @@
 #include "doctest.h"
 #include <iostream>
 #include <vector>
+#include <stdexcept>
 using namespace std;
 namespace ariel
 {
@@ -14,8 +15,6 @@ namespace ariel
         bool isdirected;
     public:
         Graph();
-        ~Graph() {  }
-
         //this function will load the graph to the object
         void loadGraph(vector<vector<int>> g);
 

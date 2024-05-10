@@ -29,10 +29,10 @@ namespace ariel
         recStack[ver] = true;
         bool isDirected = graph.isDirected();
         size_t vertixs = (size_t)graph.getNumVertices();
-        vector<vector<int>> G = graph.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
+        vector<vector<int>> GraphMat = graph.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
         for (size_t i = 0; i < vertixs; i++)
         {
-            if (G[ver][i] != 0)
+            if (GraphMat[ver][i] != 0)
             {
                 if (!visited[i])
                 {
@@ -181,6 +181,10 @@ namespace ariel
         {
             return "-1";
         }
+        if (negativeCycle(g) != "No negative cycle found")
+        {
+            throw runtime_error("Graph contains a negative-weight cycle!");
+        }
         if (start == end)
         {
             return to_string(start);
@@ -209,24 +213,7 @@ namespace ariel
                     }
                 }
             }
-        }
-        if (negativeCycle(g) != "No negative cycle found")
-        {
-            throw runtime_error("Graph contains a negative-weight cycle!");
-        }
-        // Check for negative-weight cycles. If there is a cycle, a shorter path
-        // will be found even after V-1 relaxations.
-        // for (size_t u = 0; u < V; ++u)
-        // {
-        //     for (size_t v = 0; v < V; ++v)
-        //     {
-        //         if (/*G[u][v] != 0 && dist[u] + G[u][v] < dist[v] || v==V && u==V-1*/1)
-        //         {
-        //             throw runtime_error("Graph contains a negative-weight cycle!");
-        //         }
-        //     }
-        // }
-        // Reconstruct the shortest path using predecessor information (if destination is reachable)
+        }    
         if (dist[e] == numeric_limits<int>::max())
         {
             return "-1";
@@ -267,7 +254,7 @@ namespace ariel
             vector<int> color(V, 0);
 
             // Get the adjacency matrix of the graph
-            vector<vector<int>> G = g.getAdjacencyMatrix();
+            vector<vector<int>> GraphMat = g.getAdjacencyMatrix();
 
             // BFS to check if any odd-length cycle exists (not bipartite)
             for (size_t u = 0; u < V; ++u)
@@ -285,7 +272,7 @@ namespace ariel
                         // Check for adjacent vertices
                         for (size_t w = 0; w < V; ++w)
                         {
-                            if (G[v][w] != 0 && G[w][v] != 0)
+                            if (GraphMat[v][w] != 0 && GraphMat[w][v] != 0)
                             {
                                 if (color[w] == 0)
                                 {
@@ -373,7 +360,7 @@ namespace ariel
         vector<int> predecessor(vertixNumber, -1);
         int cycle_start = -1;
         distance[0] = 0;
-        vector<vector<int>> G = graph.getAdjacencyMatrix();
+        vector<vector<int>> GraphMat = graph.getAdjacencyMatrix();
 
         // Run Bellman-Ford algorithm
         for (size_t i = 0; i < vertixNumber; ++i)
@@ -382,9 +369,9 @@ namespace ariel
             {
                 for (size_t v = 0; v < vertixNumber; ++v)
                 {
-                    if (G[u][v] != 0)
+                    if (GraphMat[u][v] != 0)
                     {
-                        int new_distance = distance[u] + G[u][v];
+                        int new_distance = distance[u] + GraphMat[u][v];
                         if (new_distance < distance[v])
                         {
                             distance[v] = new_distance;
@@ -396,7 +383,6 @@ namespace ariel
                 }
             }
         }
-
         vector<int> cycle;
         if (cycle_start != -1)
         {
@@ -425,6 +411,7 @@ namespace ariel
                     cycle_str += "->";
                 }
             }
+            if(cycle_str.size()>1)
             return "The negative cycle is: " + cycle_str;
         }
 
@@ -437,14 +424,14 @@ namespace ariel
     //     {
     //         return "No negative cycle found";
     //     }
-    //     size_t n = (size_t)graph.getNumVertices();
+    //     size_t vertixNum = (size_t)graph.getNumVertices();
     //     vector<int> distance(n, INT_MAX);
     //     vector<int> predecessor(n, -1);
     //     int cycle_start = -1;
     //     distance.resize(n);
     //     // Assume the source vertex is 0
     //     distance[0] = 0;
-    //     std::vector<std::vector<int>> G = graph.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
+    //       vector<  vector<int>> G = graph.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
     //     for (size_t i = 0; i < n; ++i)
     //     {
     //         cycle_start = -1;

@@ -105,5 +105,4 @@ namespace ariel
        g.numVertices=numVertices; 
         return g;
     }
-    
 }
