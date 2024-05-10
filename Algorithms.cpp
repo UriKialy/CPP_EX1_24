@@ -146,11 +146,8 @@ namespace ariel
 
         size_t V = (size_t)g.getNumVertices(); // Get the number of vertices from the matrix size
         vector<int> neighborsList;
-<<<<<<< HEAD
-        vector<vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
-=======
+
         vector<vector<int>> GraphMat = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
->>>>>>> 8880ed64dc37bf940a2b1ab8b9fd4aeb82b85334
         // Iterate through all vertices in the adjacency matrix row for the given vertex
         unsigned long v = (unsigned long)vertex;
         for (unsigned long neighbor = 0; neighbor < V; ++neighbor)
@@ -201,11 +198,7 @@ namespace ariel
         dist[(unsigned long)s] = 0; // Distance from source to itself is 0
         // Create a predecessor vector to store the previous node in the shortest path
         vector<int> prev(V, -1);
-<<<<<<< HEAD
-        vector<vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
-=======
         vector<vector<int>> GraphMat = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
->>>>>>> 8880ed64dc37bf940a2b1ab8b9fd4aeb82b85334
         // Relax all edges V-1 times. If negative cycle is found, return false.
         for (size_t i = 0; i < V - 1; ++i)
         {

@@ -3,7 +3,6 @@
 #include "doctest.h"
 #include <iostream>
 #include <vector>
-#include <stdexcept>
 using namespace std;
 namespace ariel
 {
