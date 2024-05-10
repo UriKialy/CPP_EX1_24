@@ -5,128 +5,148 @@
 #include <stack>
 namespace ariel
 {
-    // Structure to store a path node with its vertex index and previous node
+    // Structure to store a path node with its vertex index and previous node for shortest path
     struct PathNode
     {
         int vertex;
         int prev;
     };
-    bool Algorithms::isContainsCycle(Graph g)
+    vector<size_t> Algorithms::CycleVectrorToString(size_t startNode, size_t endNode, vector<size_t> &parent)
     {
-        if (g.getNumVertices() < 2 || g.getNumEdges() < 2)
+        vector<size_t> cycle;
+        for (size_t i = startNode; i != endNode; i = parent[i])
         {
-            return false; // Empty graph or no edges, no cycle
+            cycle.push_back(i);
         }
+        cycle.push_back(endNode); // Complete the cycle by adding the start node again
+        reverse(cycle.begin(), cycle.end());
+        return cycle;
+    }
 
-        size_t numVertices = (size_t)g.getNumVertices();
-
-        // Create a visited array to keep track of visited vertices
-        vector<bool> visited(numVertices, false);
-
-        // Create a recursion stack to keep track of vertices in the current DFS path
-        stack<int> recursionStack;
-
-        // Function to perform DFS traversal
-        function<bool(int)> dfs = [&](size_t vertex)
+    bool Algorithms::isCyclicUtil(size_t ver, vector<bool> &visited, vector<bool> &recStack, vector<size_t> &parent, Graph &graph, vector<size_t> &cycle)
+    {
+        visited[ver] = true;
+        recStack[ver] = true;
+        bool isDirected = graph.isDirected();
+        size_t vertixs = (size_t)graph.getNumVertices();
+        vector<vector<int>> G = graph.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
+        for (size_t i = 0; i < vertixs; i++)
         {
-            // Mark the current vertex as visited
-            visited[vertex] = true;
-
-            // Push the current vertex to the recursion stack
-            recursionStack.push(vertex);
-
-            // Explore neighbors (consider only upper triangular part for undirected graphs)
-            for (size_t neighbor = vertex + 1; neighbor < numVertices; neighbor++)
+            if (G[ver][i] != 0)
             {
-                if (g.getAdjacencyMatrix()[vertex][neighbor] != 0)
-                { // Check for edge
-                    if (!visited[neighbor])
+                if (!visited[i])
+                {
+                    parent[i] = ver;
+                    if (isCyclicUtil(i, visited, recStack, parent, graph, cycle))
                     {
-                        // If neighbor is not visited, recur for it
-                        if (dfs(neighbor))
-                        {
-                            return true; // Cycle found
-                        }
-                    }
-                    else if (recursionStack.top() != neighbor)
-                    {
-                        // If neighbor is visited and not present in current DFS path (back edge), cycle found
                         return true;
                     }
                 }
+                else if ((isDirected && recStack[i]) || (!isDirected && recStack[i] && parent[ver] != i))
+                {
+                    cycle = CycleVectrorToString(ver, i, parent);
+                    return true;
+                }
             }
+        }
+        recStack[ver] = false;
+        return false;
+    }
 
-            // Pop the vertex from the recursion stack as we have finished exploring its neighbors
-            recursionStack.pop();
-
-            return false; // No cycle found in this DFS path
-        };
-
-        // Start DFS from each unvisited vertex
-        for (size_t i = 0; i < numVertices; i++)
+    string Algorithms::isContainsCycle(Graph &graph)
+    {
+        if (graph.getNumVertices() < 2 || graph.getNumEdges() < 2)
+        {
+            return "0"; // Return "0" if the graph is empty or has les than 2 edge\vertex
+        }
+        size_t vertixs = (size_t)graph.getNumVertices();
+        vector<bool> visited(vertixs, false);
+        vector<bool> recStack(vertixs, false);
+        vector<size_t> parent(vertixs, SIZE_MAX);
+        vector<size_t> cycle;
+        string cycleStr;
+        for (size_t i = 0; i < vertixs; i++)
         {
             if (!visited[i])
             {
-                if (dfs(i))
+                if (isCyclicUtil(i, visited, recStack, parent, graph, cycle))
                 {
-                    return true; // Cycle found in the graph
+
+                    for (size_t j = 0; j < cycle.size(); ++j)
+                    {
+                        cycleStr += to_string(cycle[j]);
+                        if (j != cycle.size() - 1)
+                        {
+                            cycleStr += "->";
+                        }
+                    }
+                    cycleStr += "->" + to_string(cycle[0]); // Complete the cycle by adding the start node again
+                    if (cycleStr.size() > 1)
+                    {
+                        return cycleStr;
+                    }
+                }
+            }
+        }
+        cycleStr = "0";
+        return cycleStr; // Return "0" if no cycle is found
+    }
+
+    int Algorithms::isConnected(ariel::Graph &g)
+    {
+        if (g.getNumVertices() < 1 || g.getNumEdges() < 1)
+        {
+            return 0; // Empty graph is not connected
+        }
+        size_t V = (size_t)g.getNumVertices();
+
+        // Ensure visited array is initialized to false
+        vector<bool> visited(V, false);
+
+        // DFS traversal from an arbitrary vertex
+        if (!DFSUtil(g, 0, visited))
+        {
+
+            return 0; // Graph is not connected if a vertex is not reachable
+        }
+
+        // Check all vertices in case of disconnected components
+        for (size_t i = 0; i < V; ++i)
+        { // Iterate through all vertices
+            if (!visited[i])
+            {
+                return 0; // If a vertex is still unvisited, the graph is not connected
+            }
+        }
+        if (g.isDirected())
+        { // If the graph is directed, check the reverse graph as well
+            Graph reverseGraph = g.getTranspose();
+            vector<bool> visited((size_t)reverseGraph.getNumVertices(), false);
+            // DFS traversal from an arbitrary vertex
+            if (!DFSUtil(reverseGraph, 0, visited))
+            {
+                return 0; // Graph is not connected if a vertex is not reachable
+            }
+
+            // Check all vertices in case of disconnected components
+            for (size_t i = 0; i < V; ++i)
+            { // Iterate through all vertices
+                if (!visited[i])
+                {
+                    return 0; // If a vertex is still unvisited, the graph is not connected
                 }
             }
         }
 
-        // No cycle found
-        return false;
-    }
-    int Algorithms::isConnected(ariel::Graph g) {
-    if (g.getNumVertices() < 1 || g.getNumEdges() < 1 ) {
-        return 0; // Empty graph is not connected
-    }
-    size_t V = (size_t)g.getNumVertices();
-
-    // Ensure visited array is initialized to false
-    std::vector<bool> visited(V, false); 
-
-    // DFS traversal from an arbitrary vertex
-    if (!DFSUtil(g, 0, visited)) {
-        cout<<"line 91: first dfs failed"<<endl; 
-        return 0; // Graph is not connected if a vertex is not reachable
+        return 1; // Graph is connected
     }
 
-    // Check all vertices in case of disconnected components
-    for (size_t i = 0; i < V; ++i) { // Iterate through all vertices
-        if (!visited[i]) {
-            // for(size_t j=0;j<V;j++){
-            //     cout<<j<<visited[j]<<" ";
-            // }
-            return 0; // If a vertex is still unvisited, the graph is not connected
-        }
-    }
-    if(g.isDirected()){ // If the graph is directed, check the reverse graph as well
-     Graph reverseGraph = g.getTranspose(); 
-     std::vector<bool> visited((size_t)reverseGraph.getNumVertices(), false);
-       // DFS traversal from an arbitrary vertex
-    if (!DFSUtil(reverseGraph, 0, visited)) {
-        return 0; // Graph is not connected if a vertex is not reachable
-    }
-
-    // Check all vertices in case of disconnected components
-    for (size_t i = 0; i < V; ++i) { // Iterate through all vertices
-        if (!visited[i]) {
-            return 0; // If a vertex is still unvisited, the graph is not connected
-        }
-    }
-    }
-
-    return 1; // Graph is connected
-}
-
-
-    std::vector<int> Algorithms::getNeighbors(Graph g, int vertex)
+    vector<int> Algorithms::getNeighbors(Graph &g, int vertex)
     {
 
         size_t V = (size_t)g.getNumVertices(); // Get the number of vertices from the matrix size
-        std::vector<int> neighborsList;
-        std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
+        vector<int> neighborsList;
+        vector<vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
         // Iterate through all vertices in the adjacency matrix row for the given vertex
         unsigned long v = (unsigned long)vertex;
         for (unsigned long neighbor = 0; neighbor < V; ++neighbor)
@@ -139,13 +159,13 @@ namespace ariel
         }
         return neighborsList;
     }
-    bool Algorithms::DFSUtil(ariel::Graph graph, size_t v, std::vector<bool> &visited)
+    bool Algorithms::DFSUtil(ariel::Graph &graph, size_t v, vector<bool> &visited)
     {
-        visited[v] = true;                         // Mark the current node as visited
-        size_t V = (size_t)graph.getNumVertices(); // Get the number of vertices in the graph
-        // Recur for all adjacent vertices
-        std::vector<int> neighbors = Algorithms::getNeighbors(graph, static_cast<size_t>(v)); // Call the getNeighbors function
-        std::vector<size_t> castedNeighbors(neighbors.begin(), neighbors.end());              // Cast the neighbors vector to std::vector<size_t>
+        visited[v] = true;                                                               // Mark the current node as visited
+        size_t V = (size_t)graph.getNumVertices();                                       // Get the number of vertices in the graph
+                                                                                         // Recur for all adjacent vertices
+        vector<int> neighbors = Algorithms::getNeighbors(graph, static_cast<size_t>(v)); // Call the getNeighbors function
+        vector<size_t> castedNeighbors(neighbors.begin(), neighbors.end());              // Cast the neighbors vector to   vector<size_t>
         for (size_t neighbor : castedNeighbors)
         { // Iterate over the elements of the castedNeighbors vector
             if (!visited[neighbor])
@@ -161,7 +181,8 @@ namespace ariel
         {
             return "-1";
         }
-        if(start==end){
+        if (start == end)
+        {
             return to_string(start);
         }
         size_t s = (size_t)start;
@@ -172,7 +193,7 @@ namespace ariel
         dist[(unsigned long)s] = 0; // Distance from source to itself is 0
         // Create a predecessor vector to store the previous node in the shortest path
         vector<int> prev(V, -1);
-        std::vector<std::vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
+        vector<vector<int>> G = g.getAdjacencyMatrix(); // Get the adjacency matrix of the graph
         // Relax all edges V-1 times. If negative cycle is found, return false.
         for (size_t i = 0; i < V - 1; ++i)
         {
@@ -189,7 +210,8 @@ namespace ariel
                 }
             }
         }
-        if(negativeCycle(g) != "No negative cycle found"){
+        if (negativeCycle(g) != "No negative cycle found")
+        {
             throw runtime_error("Graph contains a negative-weight cycle!");
         }
         // Check for negative-weight cycles. If there is a cycle, a shorter path
@@ -230,7 +252,7 @@ namespace ariel
         return shortestPath;
     }
 
-    string Algorithms::isBipartite(ariel::Graph g)
+    string Algorithms::isBipartite(ariel::Graph &g)
     {
         if (g.getNumVertices() == 0)
         {
@@ -238,14 +260,14 @@ namespace ariel
         }
         else
         {
-            size_t V = (size_t)g.getNumVertices();// Get the number of vertices in the graph
+            size_t V = (size_t)g.getNumVertices(); // Get the number of vertices in the graph
 
             // Create a color vector to store colors assigned to vertices.
             // 0 - Uncolored, 1 - Red, -1 - Blue
             vector<int> color(V, 0);
 
             // Get the adjacency matrix of the graph
-            std::vector<std::vector<int>> G = g.getAdjacencyMatrix();
+            vector<vector<int>> G = g.getAdjacencyMatrix();
 
             // BFS to check if any odd-length cycle exists (not bipartite)
             for (size_t u = 0; u < V; ++u)
@@ -263,7 +285,7 @@ namespace ariel
                         // Check for adjacent vertices
                         for (size_t w = 0; w < V; ++w)
                         {
-                            if (G[v][w] != 0 && G[w][v]!=0)
+                            if (G[v][w] != 0 && G[w][v] != 0)
                             {
                                 if (color[w] == 0)
                                 {
@@ -296,7 +318,7 @@ namespace ariel
             }
 
             // Construct the output string efficiently (avoid string concatenation)
-            std::stringstream result;
+            stringstream result;
             result << "The graph is bipartite: ";
 
             if (!group1.empty())
@@ -316,92 +338,99 @@ namespace ariel
                     }
                 }
                 result << "}";
-            }          
-                if (!group1.empty())
+            }
+            if (!group1.empty())
+            {
+                result << ", "; // Add comma only if both groups have elements
+            }
+            result << "B={";
+            bool firstVertex2 = true;
+            for (int vertex : group2)
+            {
+                if (firstVertex2)
                 {
-                    result << ", "; // Add comma only if both groups have elements
+                    result << vertex;
+                    firstVertex2 = false;
                 }
-                result << "B={";
-                bool firstVertex2 = true;
-                for (int vertex : group2)
+                else
                 {
-                    if (firstVertex2)
-                    {
-                        result << vertex;
-                        firstVertex2 = false;
-                    }
-                    else
-                    {
-                        result << ", " << vertex;
-                    }
+                    result << ", " << vertex;
                 }
-                result << "}";
+            }
+            result << "}";
             return result.str();
         }
     }
-    string Algorithms::negativeCycle(ariel::Graph graph) {
-    if (graph.getNumVertices() == 0 || graph.getNumEdges() < 1) {
-        return "No negative cycle found";
-    }
-    
-    size_t n = (size_t)graph.getNumVertices();
-    vector<int> distance(n, INT_MAX);
-    vector<int> predecessor(n, -1);
-    int cycle_start = -1;
-    distance[0] = 0;
-    std::vector<std::vector<int>> G = graph.getAdjacencyMatrix();
-    
-    // Run Bellman-Ford algorithm
-    for (size_t i = 0; i < n; ++i) {
-        for (size_t u = 0; u < n; ++u) {
-            for (size_t v = 0; v < n; ++v) {
-                if (G[u][v] != 0) {
-                    int new_distance = distance[u] + G[u][v];
-                    if (new_distance < distance[v]) {
-                        distance[v] = new_distance;
-                        predecessor[v] = (int)u;
-                        if (i == n - 1)
-                            cycle_start = v; // Found a negative cycle
+    string Algorithms::negativeCycle(ariel::Graph &graph)
+    {
+        if (graph.getNumVertices() == 0 || graph.getNumEdges() < 1)
+        {
+            return "No negative cycle found";
+        }
+
+        size_t vertixNumber = (size_t)graph.getNumVertices();
+        vector<int> distance(vertixNumber, INT_MAX);
+        vector<int> predecessor(vertixNumber, -1);
+        int cycle_start = -1;
+        distance[0] = 0;
+        vector<vector<int>> G = graph.getAdjacencyMatrix();
+
+        // Run Bellman-Ford algorithm
+        for (size_t i = 0; i < vertixNumber; ++i)
+        {
+            for (size_t u = 0; u < vertixNumber; ++u)
+            {
+                for (size_t v = 0; v < vertixNumber; ++v)
+                {
+                    if (G[u][v] != 0)
+                    {
+                        int new_distance = distance[u] + G[u][v];
+                        if (new_distance < distance[v])
+                        {
+                            distance[v] = new_distance;
+                            predecessor[v] = (int)u;
+                            if (i == vertixNumber - 1)
+                                cycle_start = v; // Found a negative cycle
+                        }
                     }
                 }
             }
         }
-    }
-    
-    vector<int> cycle;
-    if (cycle_start != -1) {
-        size_t v = (size_t)cycle_start;
-        for (size_t i = 0; i < n; ++i) {
-            v = (size_t)predecessor[(size_t)v];
-        }
-        
-        for (int u = v;; u = predecessor[(size_t)u]) {
-            cycle.push_back(u);
-            if (u == v && cycle.size() > 1) {
-                break;
+
+        vector<int> cycle;
+        if (cycle_start != -1)
+        {
+            size_t v = (size_t)cycle_start;
+            for (size_t i = 0; i < vertixNumber; ++i)
+            {
+                v = (size_t)predecessor[(size_t)v];
             }
-        }
-        reverse(cycle.begin(), cycle.end());
-        
-        string cycle_str;
-        for (size_t i = 0; i < cycle.size(); ++i) {
-            cycle_str += to_string(cycle[i]);
-            if (i != cycle.size() - 1) {
-                cycle_str += "->";
+
+            for (int u = v;; u = predecessor[(size_t)u])
+            {
+                cycle.push_back(u);
+                if (u == v && cycle.size() > 1)
+                {
+                    break;
+                }
             }
+            reverse(cycle.begin(), cycle.end());
+
+            string cycle_str;
+            for (size_t i = 0; i < cycle.size(); ++i)
+            {
+                cycle_str += to_string(cycle[i]);
+                if (i != cycle.size() - 1)
+                {
+                    cycle_str += "->";
+                }
+            }
+            return "The negative cycle is: " + cycle_str;
         }
-        return "The negative cycle is: " + cycle_str;
+
+        return "No negative cycle found";
     }
 
-    return "No negative cycle found";
-}
-
-
-
-
-
-
-   
     // string Algorithms::negativeCycle(ariel::Graph graph)
     // {
     //     if (graph.getNumVertices() == 0 || graph.getNumEdges() < 1)
@@ -474,4 +503,43 @@ namespace ariel
 
     //     return "No negative cycle found"; // No negative cycle found
     // }
+    // Function to find a negative cycle in the graph
+
+    /*
+ void Algorithms::negativeCycle(const Graph& g) {
+     vector<vector<int>> graph = g.getg();
+     vector<int> dist;
+     vector<int> pred;
+     // Call bellmond-ford method
+     bool no_negative_cycle = bellmanFord(graph, 0, dist, pred);   // Call bellmanFord on first vertex
+     if (no_negative_cycle)
+     {
+         cout << "No negative cycle";
+         return;
+     }
+
+     int vertex; // This will store a vertex which we found in the negative cycle so we can trace it back
+     // Relaxation to find a vertex which is inside the negative cycle
+     for (int u = 0; u < dist.size(); u++) {
+         for (int v = 0; v < dist.size(); v++) {
+             int weight = graph[u][v];
+             if (weight != 0 && dist[u] != INF && dist[u] + weight < dist[v]) {
+                 pred[v] = u;    // Added for tracing it back
+                 vertex = u;
+             }
+         }
+     }
+     // Now we will trace it back untill we get back to the same point and then print
+     int trace = vertex;
+     string path = to_string(vertex);   // Add the trace to the string
+     for (int i = 0; i < pred.size(); i++)
+     {
+         path = to_string(pred[trace])+"->"+path;  // Add another trace to the string
+         trace = pred[trace];
+         if(trace == vertex){
+             cout << path;
+             return;
+         }
+     }
+ }*/
 } // namespace ariel

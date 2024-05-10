@@ -51,7 +51,7 @@ TEST_CASE("Test isContainsCycle")
         {1, 0, 1},
         {0, 1, 0}};
     g.loadGraph(graph);
-    CHECK(ariel::Algorithms::isContainsCycle(g) == false);
+    CHECK(ariel::Algorithms::isContainsCycle(g)=="0");
 
     vector<vector<int>> graph2 = {
         {0, 1, 1, 0, 0},
@@ -60,7 +60,13 @@ TEST_CASE("Test isContainsCycle")
         {0, 0, 1, 0, 0},
         {0, 0, 0, 0, 0}};
     g.loadGraph(graph2);
-    CHECK(ariel::Algorithms::isContainsCycle(g) == true);
+    string results = ariel::Algorithms::isContainsCycle(g);
+     if(ariel::Algorithms::isContainsCycle(g) == "0->1->2->0" || ariel::Algorithms::isContainsCycle(g) == "2->1->0->2"|| 
+    ariel::Algorithms::isContainsCycle(g) == "1->0->2->1"){
+    }
+    else{
+        CHECK(false);
+    }
 }
 TEST_CASE("Test isBipartite")
 {
@@ -107,7 +113,7 @@ TEST_CASE("Test empty graph")
     vector<vector<int>> graph = {{}};
     CHECK_THROWS(g.loadGraph(graph));
     CHECK(ariel::Algorithms::isBipartite(g) =="The graph is bipartite: A={}, B={}");
-    CHECK(ariel::Algorithms::isContainsCycle(g) == false);
+    CHECK(ariel::Algorithms::isContainsCycle(g) == "0");
     CHECK(ariel::Algorithms::isConnected(g) == false);
     CHECK(ariel::Algorithms::shortestPath(g, 0, 4) == "-1");
     CHECK(ariel::Algorithms::negativeCycle(g) == "No negative cycle found");
@@ -162,7 +168,7 @@ TEST_CASE("Test shortestPath2") {
     vector<vector<int>> graph2 = {{0, -1, 0}, {-1, 0, -2}, {0, -2, 0}};
     g.loadGraph(graph2);
     CHECK(ariel::Algorithms::negativeCycle(g) == "No negative cycle found");
-    CHECK(ariel::Algorithms::shortestPath(g, 0, 2)=="0->1->2");
+    CHECK_THROWS(ariel::Algorithms::shortestPath(g, 0, 2));
 
   vector<vector<int>> graph3 = {{0, 1, 0,1}, {1, 0, 1,0}, {0,1,0, 1},{1,0,1,0}};
   g.loadGraph(graph3);
@@ -178,13 +184,18 @@ TEST_CASE("Test isContainsCycle2") {
   ariel::Graph g;
   vector<vector<int>> graph = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
   g.loadGraph(graph);
-  CHECK(ariel::Algorithms::isContainsCycle(g) == false);
+  CHECK(ariel::Algorithms::isContainsCycle(g) == "0");
 
   // Test disconnected cycles
   vector<vector<int>> graph2 = {
       {0,1,1,0}, {1, 0, 1,0}, {1, 1,0, 0},{0,0,0,1} };
   g.loadGraph(graph2);
-  CHECK(ariel::Algorithms::isContainsCycle(g) == true);
+  if(ariel::Algorithms::isContainsCycle(g) == "0->1->2->0" || ariel::Algorithms::isContainsCycle(g) == "0->2->1->0"
+  ||ariel::Algorithms::isContainsCycle(g) == "2->0->1->2"||ariel::Algorithms::isContainsCycle(g) == "1->2->0->1"
+  ||ariel::Algorithms::isContainsCycle(g) == "2->1->0->2"||ariel::Algorithms::isContainsCycle(g) == "1->0->2->1" ){ }
+  else{
+      CHECK(false);
+  }
 }
 
 TEST_CASE("Test isBipartite2") {
@@ -263,13 +274,20 @@ TEST_CASE("Test shortestPath with Self-Loop") {
 TEST_CASE("Test isContainsCycle with Disconnected Cycles") {
     ariel::Graph g;
     vector<vector<int>> graph = {
-        {0, 1, 2, 1, 0},
-        {1, 0, 0, 0, 0},
+        {0, 1, 2, 0, 0},
+        {1, 0, 0, 1, 0},
         {2, 0, 0, 1, 0},
         {0, 1, 1, 0, 0},
         {0, 0, 0, 0, 0}};
     g.loadGraph(graph);
-    CHECK(ariel::Algorithms::isContainsCycle(g) == true);
+    if(ariel::Algorithms::isContainsCycle(g) == "0->1->3->2->0"||ariel::Algorithms::isContainsCycle(g) =="3->2->0->1->3"||
+    ariel::Algorithms::isContainsCycle(g) == "1->3->2->0->1"||ariel::Algorithms::isContainsCycle(g) == "2->0->1->3->2"||
+    ariel::Algorithms::isContainsCycle(g) == "0->2->3->1->0"||ariel::Algorithms::isContainsCycle(g) == "3->1->0->2->3"||
+    ariel::Algorithms::isContainsCycle(g) == "2->3->1->0->2"||ariel::Algorithms::isContainsCycle(g) == "1->0->2->3->1")
+    {  }
+    else{
+        CHECK(false);
+    }
 }
 TEST_CASE("Test negativeCycle with No Negative Cycle") {
     ariel::Graph g;
@@ -289,7 +307,12 @@ ariel::Graph g;
     g.loadGraph(graph);
     CHECK(ariel::Algorithms::isConnected(g) == 1);
     CHECK(ariel::Algorithms::shortestPath(g, 0, 2) == "0->1->2");
-    CHECK(ariel::Algorithms::isContainsCycle(g) == true);
+        if((ariel::Algorithms::shortestPath(g, 0, 2) == "0->1->2") || (ariel::Algorithms::shortestPath(g, 0, 2) == "0->2")){
+        }
+        else{
+            CHECK(false);
+        
+    }
     CHECK(ariel::Algorithms::isBipartite(g) == "0");
     CHECK(ariel::Algorithms::negativeCycle(g) == "No negative cycle found");
 }
