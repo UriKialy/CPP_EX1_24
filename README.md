@@ -1,11 +1,12 @@
 Hi there, this is a little bit of explaining about this project:
-we have some files here but I'll go thrugh what I think is necessary
+The main idea is to have the  ability to implement the algorithms learned the previous semester on a graph that represented in a adjacency matrix
+we have some files here but I'll go through what I think is necessary
 
 **Namespace**
 
 * `ariel`: Encapsulates the functionalities within the `ariel` namespace.
 **Graph.cpp**
-  This class represnt the GRaph object with some functionalities that needed
+  This class represents the Graph object with some functionalities that needed
   
 **Algorithms.hpp**
 
@@ -21,7 +22,7 @@ This class provides various graph algorithms:
 * `isContainsCycle(Graph& g)`: Checks if a graph contains a cycle and returns a string represnt the cycle if not retuns "0"
 * `isBipartite(Graph& g)`: Checks if a graph is bipartite and returns a string indicating the bipartition or an empty string if the graph is not bipartite.
 * `negativeCycle(Graph& g)`: Check if there a negative cycle in a graph. If there is no negative cycle, it returns "no negative cycle".
-The code also posses a helper functions and all of the function was with the help of Gemini with verius promts (varient on the task)
+The code also posses a helper functions and all of the function was with the help of Gemini with various prompts (variant on the task)
 
 **Compiling and Running**
 
