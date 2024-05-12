@@ -1,6 +1,10 @@
 Hi there, this is a little bit of explaining about this project:
 we have some files here but I'll go thrugh what I think is necessary
 
+**Namespace**
+
+* `ariel`: Encapsulates the functionalities within the `ariel` namespace.
+  
 **Algorithms.hpp**
 
 This header file defines the `Algorithms` class which provides various graph algorithms implemented in C++.
@@ -13,19 +17,17 @@ This header file defines the `Algorithms` class which provides various graph alg
 * `Graph.hpp`: Includes the definition of the `Graph` class.
 * `<string>`: Provides string manipulation functionalities.
 
-**Namespace**
 
-* `ariel`: Encapsulates the functionalities within the `ariel` namespace.
 
 **Class: Algorithms**
 
 This class provides various graph algorithms:
 
-* `isConnected(Graph g)`: Checks if a graph is connected and returns 1 if it is, 0 otherwise.
-* `shortestPath(Graph &g, int start, int end)`: Finds the shortest path between two vertices in a graph and returns it as a string. If there is no path, it returns an empty string.
-* `isContainsCycle(Graph g)`: Checks if a graph contains a cycle and returns true if it does, false otherwise.
-* `isBipartite(Graph g)`: Checks if a graph is bipartite and returns a string indicating the bipartition or an empty string if the graph is not bipartite.
-* `negativeCycle(Graph g)`: Check if there a negative cycle in a graph. If there is no negative cycle, it returns "no negative cycle".
+* `isConnected(Graph& g)`: Checks if a graph is connected and returns 1 if it is, 0 otherwise.
+* `shortestPath(Graph &g, int start, int end)`: Finds the shortest path between two vertices in a graph and returns it as a string. If there is no path, it returns "-1".
+* `isContainsCycle(Graph& g)`: Checks if a graph contains a cycle and returns a string represnt the cycle if not retuns "0"
+* `isBipartite(Graph& g)`: Checks if a graph is bipartite and returns a string indicating the bipartition or an empty string if the graph is not bipartite.
+* `negativeCycle(Graph& g)`: Check if there a negative cycle in a graph. If there is no negative cycle, it returns "no negative cycle".
 The code also posses a helper functions and all of the function was with the help of Gemini with verius promts (varient on the task)
 
 **Compiling and Running**
