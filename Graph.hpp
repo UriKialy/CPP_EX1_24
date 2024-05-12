@@ -15,16 +15,16 @@ namespace ariel
     public:
         Graph();
         //this function will load the graph to the object
-        void loadGraph(vector<vector<int>> g);
+        void loadGraph(vector<vector<int>> graph);
 
         //this function will print the graph
         void printGraph();  
 
         //this function will return the adjacency matrix of the graph
-        std::vector<std::vector<int>> getAdjacencyMatrix();
+        std::vector<vector<int>> getAdjacencyMatrix();
 
         //this function will return the number of vertices in the graph
-        int getNumVertices();
+        size_t getNumVertices();
 
         //this function will return the number of edges in the graph
         int getNumEdges();

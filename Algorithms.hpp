@@ -26,8 +26,8 @@ namespace ariel{
     // the following functions are helper functions for the above . 
 
 
-    // this function will return the MST of the graph as a string.  
-    static   vector<int> getNeighbors(Graph& graph,int vertex);
+    // this function will return the  neighbors of a vertex in the graph 
+    static  vector<int> getNeighbors(Graph& graph,int vertex);
 
     // Recursive DFS helper function
     static bool DFSUtil(ariel::Graph& graph, size_t v, vector<bool>& visited); 

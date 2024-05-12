@@ -138,13 +138,7 @@ TEST_CASE("Test negative cycle")
         {0, 0, 4, 0, 5},
         {0, 0, 0, 5, 0}};
     g.loadGraph(graph2);
-        cout<<ariel::Algorithms::negativeCycle(g)<<endl;
-            if(ariel::Algorithms::negativeCycle(g) == "0->1->2->0" || ariel::Algorithms::negativeCycle(g) == "0->2->1->0"
-      ||ariel::Algorithms::negativeCycle(g) == "2->0->1->2"||ariel::Algorithms::negativeCycle(g) == "1->2->0->1"
-      ||ariel::Algorithms::negativeCycle(g) == "2->1->0->2"||ariel::Algorithms::negativeCycle(g) == "1->0->2->1" ){ }
-      else{
-          CHECK(false);
-      }
+    CHECK(ariel::Algorithms::negativeCycle(g) == "The graph contains a negative cycle");
 }
 TEST_CASE("Test isConnected2")
 {
@@ -164,30 +158,29 @@ TEST_CASE("Test isConnected2")
     CHECK(ariel::Algorithms::isConnected(g) == 0);
 }
 
-/*TEST_CASE("Test shortestPath2") {
-  // Test non-existent vertices
-  ariel::Graph g;
-  vector<vector<int>> graph = {{0, 1, 0}, {1, 0, 1}, {0, 1, 0}};
-  g.loadGraph(graph);
-  CHECK(ariel::Algorithms::shortestPath(g, 3, 2)=="-1");
-  CHECK(ariel::Algorithms::shortestPath(g, -1, 0)=="-1");
-  // Test shortest path to itself
+TEST_CASE("Test shortestPath2")
+{
+    // Test non-existent vertices
+    ariel::Graph g;
+    vector<vector<int>> graph = {{0, 1, 0}, {1, 0, 1}, {0, 1, 0}};
+    g.loadGraph(graph);
+    CHECK(ariel::Algorithms::shortestPath(g, 3, 2) == "-1");
+    CHECK(ariel::Algorithms::shortestPath(g, -1, 0) == "-1");
+    // Test shortest path to itself
 
-  CHECK(ariel::Algorithms::shortestPath(g, 0, 0) == "0");
+    CHECK(ariel::Algorithms::shortestPath(g, 0, 0) == "0");
     vector<vector<int>> graph2 = {{0, -1, 0}, {-1, 0, -2}, {0, -2, 0}};
     g.loadGraph(graph2);
-    CHECK(ariel::Algorithms::negativeCycle(g) == "No negative cycle found");
-    CHECK(ariel::Algorithms::shortestPath(g, 0, 2)=="-1");
-
-   vector<vector<int>> graph3 = {{0, 1, 0,1}, {1, 0, 1,0}, {0,1,0, 1},{1,0,1,0}};
-   g.loadGraph(graph3);
- //  cout<<ariel::Algorithms::shortestPath(g, 0, 2)<<endl;
-  if((ariel::Algorithms::shortestPath(g, 0, 2) == "0->1->2" )|| (ariel::Algorithms::shortestPath(g, 0, 2) == "0->3->2")){
-  }
-  else{
-      CHECK(false);
-  }
-}*/
+    CHECK(ariel::Algorithms::shortestPath(g, 0, 2) == "-1");
+    vector<vector<int>> graph3 = {{0, 1, 0, 1}, {1, 0, 1, 0}, {0, 1, 0, 1}, {1, 0, 1, 0}};
+    g.loadGraph(graph3);
+    if ((ariel::Algorithms::shortestPath(g, 0, 2) == "0->1->2") || (ariel::Algorithms::shortestPath(g, 0, 2) == "0->3->2"))
+    {    }
+    else
+    {
+        CHECK(false);
+    }
+}
 
 TEST_CASE("Test isContainsCycle2")
 {
@@ -201,10 +194,11 @@ TEST_CASE("Test isContainsCycle2")
     vector<vector<int>> graph2 = {
         {0, 1, 1, 0}, {1, 0, 1, 0}, {1, 1, 0, 0}, {0, 0, 0, 1}};
     g.loadGraph(graph2);
-    if (ariel::Algorithms::isContainsCycle(g) == "0->1->2->0" || ariel::Algorithms::isContainsCycle(g) == "0->2->1->0" || 
-    ariel::Algorithms::isContainsCycle(g) == "2->0->1->2" || ariel::Algorithms::isContainsCycle(g) == "1->2->0->1" || 
-    ariel::Algorithms::isContainsCycle(g) == "2->1->0->2" || ariel::Algorithms::isContainsCycle(g) == "1->0->2->1")
-    {  }
+    if (ariel::Algorithms::isContainsCycle(g) == "0->1->2->0" || ariel::Algorithms::isContainsCycle(g) == "0->2->1->0" ||
+        ariel::Algorithms::isContainsCycle(g) == "2->0->1->2" || ariel::Algorithms::isContainsCycle(g) == "1->2->0->1" ||
+        ariel::Algorithms::isContainsCycle(g) == "2->1->0->2" || ariel::Algorithms::isContainsCycle(g) == "1->0->2->1")
+    {
+    }
     else
     {
         CHECK(false);
@@ -276,16 +270,7 @@ TEST_CASE("Test negativeCycle2 ")
         {1, 0, -6},
         {2, -6, 0}};
     g.loadGraph(graph);
-    string result = ariel::Algorithms::negativeCycle(g);
-    cout << result << endl;
-    if (result == "0->1->2->0" || result == "0->2->1->0" || result == "2->0->1->2" || result == "1->2->0->1" || 
-    result == "2->1->0->2" || result == "1->0->2->1")
-    {
-    }
-    else
-    {
-        CHECK(false);
-    }
+    CHECK(ariel::Algorithms::negativeCycle(g) == "The graph contains a negative cycle");
 }
 TEST_CASE("Test shortestPath with Self-Loop")
 {
@@ -327,6 +312,18 @@ TEST_CASE("Test negativeCycle with No Negative Cycle")
         {2, 3, 0}};
     g.loadGraph(graph);
     CHECK(ariel::Algorithms::negativeCycle(g) == "No negative cycle found");
+}
+TEST_CASE("Test negativeCycle with postive cycle Cycle")
+{
+    ariel::Graph g;
+    vector<vector<int>> graph = {
+        {0, 1, 2, 0, 1},
+        {1, 0, -6, 0, 0},
+        {2, -6, 0, 4, 0},
+        {0, 0, 4, 0, 5},
+        {1, 0, 0, 5, 0}};
+    g.loadGraph(graph);
+    CHECK(ariel::Algorithms::negativeCycle(g) == "The graph contains a negative cycle");
 }
 TEST_CASE("Test full graph")
 {

@@ -5,7 +5,7 @@ namespace ariel
 {
     int numVertices;
     int numEdges;
-    std::vector<std::vector<int>> adjacencyMatrix;
+    vector<vector<int>> adjacencyMatrix;
     bool isdirected;
     Graph::Graph()
     {
@@ -15,9 +15,9 @@ namespace ariel
         adjacencyMatrix = {};
     }
  
-    void Graph::loadGraph(vector<vector<int>> g)
+    void Graph::loadGraph(vector<vector<int>> graph)
     {
-        if (g.empty())
+        if (graph.empty())
         {
             numVertices = 0;
             numEdges = 0;
@@ -28,15 +28,15 @@ namespace ariel
         
 
         // Check if the graph is a square matrix.
-        if (g.size() == g[0].size())
+        if (graph.size() == graph[0].size())
         {
-            numVertices = g.size();
+            numVertices = graph.size();
         }
         else
         {
             throw invalid_argument("The graph is not a square matrix");
         }
-        adjacencyMatrix = g; // Load the mstrix to the graph
+        adjacencyMatrix = graph; // Load the mstrix to the graph
         int numofedges = 0;
         for (size_t i = 0; i < numVertices; i++)
         {
@@ -59,7 +59,7 @@ namespace ariel
         numEdges = (int)numofedges / 2;
         
     }
-    std::vector<std::vector<int>> Graph::getAdjacencyMatrix()
+    vector<vector<int>> Graph::getAdjacencyMatrix()
     {
         return adjacencyMatrix;
     }
@@ -67,9 +67,9 @@ namespace ariel
     {
         cout << "Graph with " << numVertices << " vertices and " << numEdges << " edges." << endl;
     }
-    int Graph::getNumVertices()
+    size_t Graph::getNumVertices()
     {
-        return this->numVertices;
+        return (size_t)this->numVertices;
     }
     int Graph::getNumEdges()
     {
@@ -80,18 +80,18 @@ namespace ariel
         return isdirected;
     }
     Graph Graph::getTranspose(){
-        Graph g;
+        Graph graph;
         for (size_t i = 0; i < numVertices; i++)
         {
             for (size_t j = 0; j < numVertices; j++)
             {
-                g.adjacencyMatrix[i][j]=adjacencyMatrix[j][i];
+                graph.adjacencyMatrix[i][j]=adjacencyMatrix[j][i];
             }
         }
-       g.loadGraph(adjacencyMatrix);
-       g.isdirected=isdirected;
-       g.numEdges=numEdges;
-       g.numVertices=numVertices; 
-        return g;
+       graph.loadGraph(adjacencyMatrix);
+       graph.isdirected=isdirected;
+       graph.numEdges=numEdges;
+       graph.numVertices=numVertices; 
+        return graph;
     }
 }
