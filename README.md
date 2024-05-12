@@ -35,5 +35,9 @@ make
 This will create an executable named `demo`. You can then run the program using the following command:
 
 ```bash
-./demo or ./test 
+./demo
+```
+or
+```bash
+./test 
 ```
