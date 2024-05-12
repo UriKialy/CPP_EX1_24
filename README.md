@@ -4,19 +4,12 @@ we have some files here but I'll go thrugh what I think is necessary
 **Namespace**
 
 * `ariel`: Encapsulates the functionalities within the `ariel` namespace.
+**Graph.cpp**
+  This class represnt the GRaph object with some functionalities that needed
   
 **Algorithms.hpp**
 
 This header file defines the `Algorithms` class which provides various graph algorithms implemented in C++.
-
-**Includes**
-
-* `<vector>`: Provides functionalities for dynamic arrays.
-* `<iostream>`: Provides functionalities for input and output streams.
-* `<bits/stdc++.h>`: Includes commonly used functionalities from the C++ Standard Library.
-* `Graph.hpp`: Includes the definition of the `Graph` class.
-* `<string>`: Provides string manipulation functionalities.
-
 
 
 **Class: Algorithms**
