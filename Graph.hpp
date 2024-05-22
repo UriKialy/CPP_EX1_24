@@ -18,19 +18,19 @@ namespace ariel
         void loadGraph(vector<vector<int>> graph);
 
         //this function will print the graph
-        void printGraph();  
+        void printGraph()const;  
 
         //this function will return the adjacency matrix of the graph
         std::vector<vector<int>> getAdjacencyMatrix();
 
         //this function will return the number of vertices in the graph
-        size_t getNumVertices();
+        size_t getNumVertices()const;
 
         //this function will return the number of edges in the graph
-        int getNumEdges();
+        int getNumEdges()const;
 
         //this function will return true if the graph is directed and false if it is not
-        bool isDirected();
+        bool isDirected()const;
 
         //this func will return the reverse graph
         Graph getTranspose();
