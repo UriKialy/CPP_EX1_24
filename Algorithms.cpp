@@ -206,11 +206,6 @@ namespace ariel
             return "-1"; // Return "-1" if the graph is empty, has less than 1 edge, or the start/end vertices are out of range, or a negative cycle is found
         }
 
-        if (start == end)
-        {
-            return to_string(start); // Return the start vertex if it is the same as the end vertex
-        }
-
         size_t Strat = (size_t)start;
         size_t End = (size_t)end;
         size_t vertexNum = (size_t)graph.getNumVertices(); // Get the number of vertices in the graph
@@ -384,21 +379,6 @@ namespace ariel
         result << "}";
 
         return result.str();
-    }
-
-    // Format the cycle vector as a string
-    string formatCycle(const vector<size_t> &cycle)
-    {
-        string cycleStr = "The cycle is: ";
-        for (size_t i = 0; i < cycle.size(); ++i)
-        {
-            cycleStr += to_string(cycle[i]);
-            if (i != cycle.size() - 1)
-            {
-                cycleStr += "->";
-            }
-        }
-        return cycleStr;
     }
 
     // Check if a graph contains a negative cycle
